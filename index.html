@@ -135,157 +135,21 @@ nav.main-nav a.active::after{
 
 .hero{
   position:relative;
-  height:92vh;
-  min-height:600px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  height:520px;
   overflow:hidden;
 }
 
 .hero-bg{
   position:absolute;
   inset:0;
-  background:url("images/banner.gif") center 30%/cover no-repeat;
-  transform:scale(1.02);
+  background:url("images/banner.gif") center/cover no-repeat;
 }
 
 .hero-bg::after{
   content:"";
   position:absolute;
   inset:0;
-  background:
-    linear-gradient(180deg, var(--bg) 0%, rgba(12,11,16,.35) 14%, rgba(12,11,16,.28) 45%, rgba(12,11,16,.7) 80%, var(--bg) 100%),
-    linear-gradient(90deg, rgba(12,11,16,.55) 0%, transparent 22%, transparent 78%, rgba(12,11,16,.55) 100%);
-}
-
-.hero-content{
-  position:relative;
-  z-index:2;
-  text-align:center;
-  padding:0 20px;
-}
-
-.eyebrow{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--accent-2);
-  margin-bottom:22px;
-}
-
-.eyebrow::before,.eyebrow::after{
-  content:"";
-  width:24px;height:1px;
-  background:var(--accent-2);
-  opacity:.6;
-}
-
-.wordmark{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(64px,14vw,168px);
-  line-height:.9;
-  letter-spacing:2px;
-  margin:0;
-  color:var(--text);
-}
-
-.tagline{
-  font-size:16px;
-  color:var(--text-muted);
-  max-width:480px;
-  margin:20px auto 0;
-  line-height:1.6;
-}
-
-/* scrubber */
-
-.scrubber{
-  position:absolute;
-  left:0; right:0; bottom:0;
-  z-index:2;
-  display:flex;
-  align-items:center;
-  gap:16px;
-  padding:18px 32px;
-  background:linear-gradient(0deg, rgba(12,11,16,.9), transparent);
-}
-
-.scrubber-play{
-  width:30px;height:30px;
-  border-radius:50%;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.05);
-  color:var(--text);
-  font-size:11px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:default;
-  flex-shrink:0;
-}
-
-.scrubber-time,.scrubber-count{
-  font-size:12px;
-  color:var(--text-muted);
-  letter-spacing:.5px;
-  white-space:nowrap;
-}
-
-.scrubber-track{
-  position:relative;
-  flex:1;
-  height:2px;
-  background:var(--line);
-  border-radius:2px;
-  overflow:hidden;
-}
-
-.scrubber-fill{
-  position:absolute;
-  left:0;top:0;bottom:0;
-  width:35%;
-  background:linear-gradient(90deg,var(--accent-2),var(--accent));
-  animation:scrub 14s linear infinite;
-}
-
-@keyframes scrub{
-  0%{width:4%;}
-  50%{width:82%;}
-  100%{width:4%;}
-}
-
-.scrubber-live{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:11px;
-  letter-spacing:2px;
-  color:var(--text-muted);
-  flex-shrink:0;
-}
-
-.scrubber-live i{
-  width:6px;height:6px;
-  border-radius:50%;
-  background:var(--accent);
-  display:inline-block;
-  animation:pulse 1.4s ease-in-out infinite;
-}
-
-@keyframes pulse{
-  0%,100%{opacity:1;}
-  50%{opacity:.25;}
-}
-
-@media (prefers-reduced-motion:reduce){
-  .scrubber-fill{animation:none;width:35%;}
-  .scrubber-live i{animation:none;}
-  html{scroll-behavior:auto;}
+  background:linear-gradient(180deg, rgba(12,11,16,.15) 0%, rgba(12,11,16,.05) 40%, var(--bg) 100%);
 }
 
 /* ---------- TOOLBAR ---------- */
@@ -696,12 +560,8 @@ footer{
   .nav-cta span.cta-text{display:none;}
   .nav-cta{padding:9px 11px;}
 
-  .hero{height:78vh;min-height:460px;}
-  .wordmark{font-size:clamp(52px,18vw,90px);}
-  .tagline{font-size:14px;}
+  .hero{height:220px;}
 
-  .scrubber{padding:14px 18px;gap:10px;}
-  .scrubber-count{display:none;}
 
   .toolbar{padding:40px 18px 20px;}
   .grid{padding:6px 18px 70px;gap:14px;grid-template-columns:repeat(2,1fr);}
@@ -716,8 +576,10 @@ footer{
 
 <header class="site-header" id="siteHeader">
   <nav class="main-nav">
-    <a href="/" class="active">Home</a>
-    <a href="/about/">About</a>
+    <a href="./" class="active">Home</a>
+    <a href="about/">About</a>
+    <a href="exclusive/">Exclusive</a>
+    <a href="request/">Request</a>
   </nav>
   <div class="social-icons">
     <a href="https://discord.gg/HdQSnmwqVz" target="_blank" rel="noopener" aria-label="Discord">
@@ -736,18 +598,6 @@ footer{
 
 <section class="hero">
   <div class="hero-bg"></div>
-  <div class="hero-content">
-    <div class="eyebrow">Ariana Grande archive</div>
-    <h1 class="wordmark">sceneagb</h1>
-    <p class="tagline">Premium scenepacks for editors — curated, catalogued and ready to cut.</p>
-  </div>
-  <div class="scrubber">
-    <div class="scrubber-play">▶</div>
-    <span class="scrubber-time mono" id="scrubTime">00:00</span>
-    <div class="scrubber-track"><div class="scrubber-fill"></div></div>
-    <span class="scrubber-count mono" id="packCount">— packs</span>
-    <span class="scrubber-live"><i></i>LIVE</span>
-  </div>
 </section>
 
 <section class="toolbar">
@@ -763,7 +613,7 @@ footer{
 </div>
 
 <section class="detail" id="detailView" style="display:none">
-  <a href="/" class="back-link">&#8592; Back to all scenepacks</a>
+  <a href="./" class="back-link">&#8592; Back to all scenepacks</a>
   <div class="detail-grid">
     <div class="detail-media">
       <img id="detailImg" alt="">
@@ -806,7 +656,6 @@ footer{
 const grid=document.getElementById("grid")
 const searchInput=document.getElementById("search")
 const statsLine=document.getElementById("statsLine")
-const packCountEl=document.getElementById("packCount")
 const header=document.getElementById("siteHeader")
 const browseView=document.getElementById("browseView")
 const detailView=document.getElementById("detailView")
@@ -882,7 +731,7 @@ function loadMore(){
 function renderDetail(id){
   const pack=packs[id]
   if(!pack){
-    detailView.innerHTML=`<a href="/" class="back-link">&#8592; Back to all scenepacks</a><p class="detail-desc">That scenepack couldn't be found.</p>`
+    detailView.innerHTML=`<a href="./" class="back-link">&#8592; Back to all scenepacks</a><p class="detail-desc">That scenepack couldn't be found.</p>`
     return
   }
 
@@ -926,7 +775,6 @@ function renderDetail(id){
 async function loadData(){
   const response=await fetch("packs.json")
   packs=await response.json()
-  packCountEl.textContent=packs.length+" packs"
   statsLine.innerHTML=`<span>${packs.length}</span> scenepacks &middot; updated regularly`
 
   const params=new URLSearchParams(window.location.search)
@@ -938,7 +786,40 @@ async function loadData(){
     renderDetail(parseInt(packId,10))
   }else{
     loadMore()
+    startSearchTypewriter()
   }
+}
+
+function startSearchTypewriter(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    searchInput.placeholder="search scenepacks..."
+    return
+  }
+  const words=packs.slice(0,20).map(p=>`search "${formatTitle(p.img)}"...`)
+  if(words.length===0) return
+  let wordIndex=0, charIndex=0, deleting=false
+
+  function tick(){
+    const current=words[wordIndex]
+    if(!deleting){
+      charIndex++
+      searchInput.placeholder=current.slice(0,charIndex)
+      if(charIndex===current.length){
+        deleting=true
+        setTimeout(tick,1300)
+        return
+      }
+    }else{
+      charIndex--
+      searchInput.placeholder=current.slice(0,charIndex)
+      if(charIndex===0){
+        deleting=false
+        wordIndex=(wordIndex+1)%words.length
+      }
+    }
+    setTimeout(tick,deleting?30:65)
+  }
+  tick()
 }
 
 window.addEventListener("scroll",()=>{
@@ -970,17 +851,6 @@ searchInput.addEventListener("input",()=>{
 
   filtered.forEach(({pack,idx})=>createCard(pack,idx))
 })
-
-/* cosmetic playback timecode */
-let secs=0
-setInterval(()=>{
-  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
-  secs=(secs+1)%240
-  const m=String(Math.floor(secs/60)).padStart(2,"0")
-  const s=String(secs%60).padStart(2,"0")
-  const el=document.getElementById("scrubTime")
-  if(el) el.textContent=`${m}:${s}`
-},1000)
 
 loadData()
 
