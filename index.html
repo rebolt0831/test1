@@ -6,148 +6,705 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <meta name="google-site-verification" content="jD0V2QANDvKtEC8ZcUBWf_XNZXmUTMlgfTkj7qdZT8g" />
-  
-<title>sceneagb</title>
 
-<meta name="description" content="Download high quality scenepacks of Ariana Grande for editing.">
+<title>sceneagb — ariana grande scenepack archive</title>
 
+<meta name="description" content="Download high quality Ariana Grande scenepacks for editing. Catalogued, updated regularly, ready to cut.">
 <meta name="keywords" content="scenepacks, editing clips, ariana scenepacks, ariana grande scenepacks, editing resources, ariana grande">
+<meta name="author" content="sceneagb">
 
-<meta name="author" content="Sceneagb">
-  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 <style>
 
+:root{
+  --bg:#0c0b10;
+  --surface:#151319;
+  --surface-2:#1d1a24;
+  --line:rgba(255,255,255,.09);
+  --text:#f6f4f9;
+  --text-muted:#948da3;
+  --accent:#ff3d7a;
+  --accent-2:#b9a6ff;
+}
+
+*{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
+
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
-background:#0b0b0b;
-color:white;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
 }
 
-/* HEADER */
+::selection{background:var(--accent);color:#0c0b10;}
 
-header{
-position:relative;
-height:1050px;
-display:flex;
-justify-content:center;
-padding:20px;
+.mono{font-family:'JetBrains Mono',monospace;}
+
+a{color:inherit;}
+
+/* ---------- HEADER / NAV ---------- */
+
+.site-header{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:22px 32px;
+  transition:background .35s ease, padding .35s ease, border-color .35s ease;
+  border-bottom:1px solid transparent;
 }
 
-header::before{
-content:"";
-position:absolute;
-inset:0;
-background:url("images/banner.gif") center/cover no-repeat;
-z-index:-1;
+.site-header.scrolled{
+  background:rgba(12,11,16,.82);
+  backdrop-filter:blur(14px);
+  padding:14px 32px;
+  border-bottom:1px solid var(--line);
 }
-
-/* DESKTOP LOGO */
 
 .logo{
-position:absolute;
-left:30px;
-top:18px;
-font-size:26px;
-font-weight:600;
-color:black;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px;
+  letter-spacing:1.5px;
+  color:var(--text);
 }
 
-/* MENU */
-
-nav{
-position:absolute;
-top:20px;
-left:50%;
-transform:translateX(-50%);
+nav.main-nav{
+  display:flex;
+  gap:34px;
 }
 
-nav a{
-margin:0 18px;
-text-decoration:none;
-color:black;
-font-weight:600;
+nav.main-nav a{
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:13px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-weight:600;
+  position:relative;
+  padding-bottom:4px;
+  transition:color .2s ease;
 }
 
-/* SEARCH */
+nav.main-nav a:hover{color:var(--text);}
+
+nav.main-nav a.active{color:var(--text);}
+
+nav.main-nav a.active::after{
+  content:"";
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:2px;
+  background:var(--accent);
+}
+
+.social-icons{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.social-icons a{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  transition:border-color .2s ease, color .2s ease, background .2s ease;
+}
+
+.social-icons a:hover{
+  border-color:var(--accent);
+  color:var(--text);
+  background:rgba(255,61,122,.08);
+}
+
+.social-icons svg{width:16px;height:16px;display:block;}
+
+/* ---------- HERO ---------- */
+
+.hero{
+  position:relative;
+  height:92vh;
+  min-height:600px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.hero-bg{
+  position:absolute;
+  inset:0;
+  background:url("images/banner.gif") center 30%/cover no-repeat;
+  transform:scale(1.02);
+}
+
+.hero-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, var(--bg) 0%, rgba(12,11,16,.35) 14%, rgba(12,11,16,.28) 45%, rgba(12,11,16,.7) 80%, var(--bg) 100%),
+    linear-gradient(90deg, rgba(12,11,16,.55) 0%, transparent 22%, transparent 78%, rgba(12,11,16,.55) 100%);
+}
+
+.hero-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+  padding:0 20px;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--accent-2);
+  margin-bottom:22px;
+}
+
+.eyebrow::before,.eyebrow::after{
+  content:"";
+  width:24px;height:1px;
+  background:var(--accent-2);
+  opacity:.6;
+}
+
+.wordmark{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(64px,14vw,168px);
+  line-height:.9;
+  letter-spacing:2px;
+  margin:0;
+  color:var(--text);
+}
+
+.tagline{
+  font-size:16px;
+  color:var(--text-muted);
+  max-width:480px;
+  margin:20px auto 0;
+  line-height:1.6;
+}
+
+/* scrubber */
+
+.scrubber{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  z-index:2;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  padding:18px 32px;
+  background:linear-gradient(0deg, rgba(12,11,16,.9), transparent);
+}
+
+.scrubber-play{
+  width:30px;height:30px;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.05);
+  color:var(--text);
+  font-size:11px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:default;
+  flex-shrink:0;
+}
+
+.scrubber-time,.scrubber-count{
+  font-size:12px;
+  color:var(--text-muted);
+  letter-spacing:.5px;
+  white-space:nowrap;
+}
+
+.scrubber-track{
+  position:relative;
+  flex:1;
+  height:2px;
+  background:var(--line);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.scrubber-fill{
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:35%;
+  background:linear-gradient(90deg,var(--accent-2),var(--accent));
+  animation:scrub 14s linear infinite;
+}
+
+@keyframes scrub{
+  0%{width:4%;}
+  50%{width:82%;}
+  100%{width:4%;}
+}
+
+.scrubber-live{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:11px;
+  letter-spacing:2px;
+  color:var(--text-muted);
+  flex-shrink:0;
+}
+
+.scrubber-live i{
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--accent);
+  display:inline-block;
+  animation:pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse{
+  0%,100%{opacity:1;}
+  50%{opacity:.25;}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .scrubber-fill{animation:none;width:35%;}
+  .scrubber-live i{animation:none;}
+  html{scroll-behavior:auto;}
+}
+
+/* ---------- TOOLBAR ---------- */
+
+.toolbar{
+  max-width:1200px;
+  margin:0 auto;
+  padding:56px 32px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+}
 
 .search-box{
-display:flex;
-justify-content:center;
-margin:30px 0;
+  position:relative;
+  flex:1;
+  min-width:260px;
+  max-width:420px;
+}
+
+.search-icon{
+  position:absolute;
+  left:16px; top:50%;
+  transform:translateY(-50%);
+  color:var(--text-muted);
+  font-size:15px;
+  pointer-events:none;
 }
 
 .search-box input{
-width:50%;
-padding:12px;
-border-radius:12px;
-border:none;
-background:rgba(255,255,255,0.1);
-backdrop-filter:blur(10px);
-color:white;
-font-size:16px; /* prevents mobile zoom */
+  width:100%;
+  padding:13px 16px 13px 40px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
 }
 
-/* GRID */
+.search-box input::placeholder{color:var(--text-muted);}
+.search-box input:focus{outline:2px solid var(--accent-2);outline-offset:1px;}
+
+.stats{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:1px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.stats span{color:var(--text);}
+
+/* ---------- GRID ---------- */
 
 .grid{
-max-width:1200px;
-margin:auto;
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-gap:25px;
-padding:40px 20px;
+  max-width:1200px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+  padding:10px 32px 100px;
 }
 
-/* CARD */
-
 .card{
-border-radius:16px;
-overflow:hidden;
-transition:.35s;
+  position:relative;
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--surface);
+  border:1px solid var(--line);
+  transition:transform .3s ease, border-color .3s ease;
 }
 
 .card:hover{
-transform:scale(1.08);
+  transform:translateY(-4px);
+  border-color:rgba(255,61,122,.4);
+}
+
+.card a{
+  display:block;
+  text-decoration:none;
+  position:relative;
 }
 
 .card img{
-width:100%;
-aspect-ratio:1/1;
-object-fit:cover;
-display:block;
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+  filter:saturate(.92);
+  transition:filter .3s ease;
 }
 
-/* MOBILE */
+.card:hover img{filter:saturate(1.05);}
+
+.frame-tag{
+  position:absolute;
+  top:10px; left:10px;
+  z-index:2;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:1px;
+  color:var(--text);
+  background:rgba(12,11,16,.65);
+  padding:3px 7px;
+  border-radius:4px;
+  border:1px solid var(--line);
+}
+
+.card-overlay{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  padding:14px 12px 12px;
+  background:linear-gradient(0deg, rgba(12,11,16,.95), transparent);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .25s ease, transform .25s ease;
+}
+
+.card:hover .card-overlay{opacity:1;transform:translateY(0);}
+
+.card-title{
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.3;
+  text-transform:capitalize;
+  color:var(--text);
+}
+
+.card-open{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:1px;
+  color:var(--accent-2);
+}
+
+.empty-state{
+  grid-column:1/-1;
+  text-align:center;
+  padding:60px 20px;
+  color:var(--text-muted);
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+}
+
+/* ---------- DETAIL VIEW ---------- */
+
+.detail{
+  max-width:1100px;
+  margin:0 auto;
+  padding:150px 32px 60px;
+}
+
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:13px;
+  letter-spacing:.5px;
+  margin-bottom:34px;
+  transition:color .2s ease;
+}
+
+.back-link:hover{color:var(--text);}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:420px 1fr;
+  gap:48px;
+  align-items:start;
+}
+
+.detail-media{
+  border-radius:14px;
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:var(--surface);
+}
+
+.detail-media img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
+
+.detail-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--accent-2);
+  display:block;
+  margin-bottom:10px;
+}
+
+.detail-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,5vw,54px);
+  letter-spacing:1px;
+  margin:0 0 22px;
+  text-transform:capitalize;
+}
+
+.meta-rows{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:20px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--line);
+}
+
+.meta-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+
+.meta-row .meta-label{
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text-muted);
+  letter-spacing:1px;
+  min-width:110px;
+}
+
+.meta-row .meta-value{font-weight:600;}
+
+.tag-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:26px;
+}
+
+.tag-pill{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:.5px;
+  color:var(--text-muted);
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:100px;
+}
+
+.detail-desc{
+  color:var(--text-muted);
+  font-size:14.5px;
+  line-height:1.75;
+  max-width:480px;
+  margin-bottom:28px;
+}
+
+.download-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 22px;
+  border-radius:12px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--text);
+  transition:border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.download-btn:hover{
+  border-color:var(--accent);
+  background:rgba(255,61,122,.1);
+  transform:translateY(-2px);
+}
+
+.download-icon{
+  width:34px;height:34px;
+  border-radius:50%;
+  background:var(--accent);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  flex-shrink:0;
+}
+
+.download-label{display:block;font-weight:700;font-size:14px;}
+.download-sub{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+.credit-line{
+  margin-top:16px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:var(--text-muted);
+}
+
+.credit-line span{color:var(--accent-2);}
+
+.more-section{
+  margin-top:80px;
+  padding-top:36px;
+  border-top:1px solid var(--line);
+}
+
+.more-heading{
+  font-size:12px;
+  letter-spacing:2.5px;
+  color:var(--text-muted);
+  margin-bottom:22px;
+}
+
+.more-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.more-card{
+  text-decoration:none;
+  color:var(--text);
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--surface);
+  border:1px solid var(--line);
+  transition:transform .3s ease, border-color .3s ease;
+}
+
+.more-card:hover{transform:translateY(-4px);border-color:rgba(255,61,122,.4);}
+
+.more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+
+.more-card-title{
+  padding:10px 12px 12px;
+  font-size:12.5px;
+  font-weight:600;
+  text-transform:capitalize;
+}
+
+@media (max-width:768px){
+  .detail{padding:120px 18px 50px;}
+  .detail-grid{grid-template-columns:1fr;gap:28px;}
+  .more-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+/* ---------- FOOTER ---------- */
+
+footer{
+  border-top:1px solid var(--line);
+  padding:56px 32px 40px;
+  text-align:center;
+}
+
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;
+  letter-spacing:1.5px;
+}
+
+.footer-tag{
+  color:var(--text-muted);
+  font-size:13px;
+  margin-top:8px;
+}
+
+.footer-links{
+  display:flex;
+  justify-content:center;
+  gap:26px;
+  margin:26px 0;
+  flex-wrap:wrap;
+}
+
+.footer-links a{
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-weight:600;
+  transition:color .2s ease;
+}
+
+.footer-links a:hover{color:var(--accent-2);}
+
+.footer-fine{
+  color:var(--text-muted);
+  font-size:11.5px;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.3px;
+}
+
+.footer-fine a{color:var(--text-muted);text-decoration:underline;}
+
+/* ---------- MOBILE ---------- */
 
 @media (max-width:768px){
 
-header{
-height:140px;
-}
+  .site-header{padding:16px 18px;}
+  nav.main-nav{gap:18px;}
+  nav.main-nav a{font-size:11px;}
+  .nav-cta span.cta-text{display:none;}
+  .nav-cta{padding:9px 11px;}
 
-/* MENU RIGHT */
+  .hero{height:78vh;min-height:460px;}
+  .wordmark{font-size:clamp(52px,18vw,90px);}
+  .tagline{font-size:14px;}
 
-nav{
-right:20px;
-left:auto;
-transform:none;
-top:20px;
-}
+  .scrubber{padding:14px 18px;gap:10px;}
+  .scrubber-count{display:none;}
 
-/* LOGO INLINE */
-
-.logo{
-position:absolute;
-left:20px;
-top:18px;
-font-size:18px;
-}
-
-.search-box input{
-width:80%;
-font-size:16px;
-}
+  .toolbar{padding:40px 18px 20px;}
+  .grid{padding:6px 18px 70px;gap:14px;grid-template-columns:repeat(2,1fr);}
 
 }
 
@@ -157,97 +714,273 @@ font-size:16px;
 
 <body>
 
-<header>
-
-<div class="logo">sceneagb</div>
-
-<nav>
-<a href="/">Home</a>
-<a href="/socials/">Socials</a>
-<a href="/about/">About</a>
-</nav>
-
+<header class="site-header" id="siteHeader">
+  <nav class="main-nav">
+    <a href="/" class="active">Home</a>
+    <a href="/about/">About</a>
+  </nav>
+  <div class="social-icons">
+    <a href="https://discord.gg/HdQSnmwqVz" target="_blank" rel="noopener" aria-label="Discord">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.369A19.79 19.79 0 0 0 16.558 3c-.211.375-.444.875-.608 1.271a18.27 18.27 0 0 0-5.9 0A12.64 12.64 0 0 0 9.442 3 19.74 19.74 0 0 0 5.68 4.373C2.684 8.845 1.874 13.202 2.279 17.5a19.9 19.9 0 0 0 6.041 3.048c.487-.657.92-1.354 1.293-2.087a12.87 12.87 0 0 1-2.037-.978c.171-.124.339-.253.5-.386a14.2 14.2 0 0 0 12.049 0c.163.133.331.262.5.386-.649.383-1.332.71-2.04.98.374.732.806 1.428 1.293 2.086a19.83 19.83 0 0 0 6.045-3.05c.5-4.97-.838-9.29-3.606-13.13ZM9.68 14.9c-1.03 0-1.874-.94-1.874-2.096 0-1.155.826-2.096 1.874-2.096 1.06 0 1.902.95 1.884 2.096 0 1.156-.826 2.096-1.884 2.096Zm4.653 0c-1.03 0-1.874-.94-1.874-2.096 0-1.155.826-2.096 1.874-2.096 1.06 0 1.903.95 1.884 2.096 0 1.156-.815 2.096-1.884 2.096Z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/sceneagbpriv/" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.2" cy="6.8" r="1"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@sceneagb" target="_blank" rel="noopener" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.5 3h2.6c.2 1.6 1.1 3 2.5 3.8 1 .6 2.1.9 3.3.9v2.7c-1.5 0-2.9-.4-4.2-1.1v6.6a5.9 5.9 0 1 1-5.9-5.9c.3 0 .6 0 .9.05v2.75a3.2 3.2 0 1 0 2.3 3.1V3Z"/></svg>
+    </a>
+  </div>
 </header>
 
-<div class="search-box">
-<input id="search" placeholder="Search scenepacks...">
-</div>
+<div id="browseView">
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="eyebrow">Ariana Grande archive</div>
+    <h1 class="wordmark">sceneagb</h1>
+    <p class="tagline">Premium scenepacks for editors — curated, catalogued and ready to cut.</p>
+  </div>
+  <div class="scrubber">
+    <div class="scrubber-play">▶</div>
+    <span class="scrubber-time mono" id="scrubTime">00:00</span>
+    <div class="scrubber-track"><div class="scrubber-fill"></div></div>
+    <span class="scrubber-count mono" id="packCount">— packs</span>
+    <span class="scrubber-live"><i></i>LIVE</span>
+  </div>
+</section>
+
+<section class="toolbar">
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input id="search" placeholder="search scenepacks...">
+  </div>
+  <div class="stats" id="statsLine"></div>
+</section>
 
 <section class="grid" id="grid"></section>
+
+</div>
+
+<section class="detail" id="detailView" style="display:none">
+  <a href="/" class="back-link">&#8592; Back to all scenepacks</a>
+  <div class="detail-grid">
+    <div class="detail-media">
+      <img id="detailImg" alt="">
+    </div>
+    <div class="detail-info">
+      <span class="detail-eyebrow">Scenepack</span>
+      <h1 class="detail-title" id="detailTitle"></h1>
+      <div class="meta-rows" id="detailMeta"></div>
+      <div class="tag-row" id="detailTags"></div>
+      <p class="detail-desc" id="detailDesc"></p>
+      <a class="download-btn" id="detailDownload" target="_blank" rel="noopener">
+        <span class="download-icon">&#11123;</span>
+        <span>
+          <span class="download-label">Download on MEGA</span>
+          <span class="download-sub">Opens in a new tab</span>
+        </span>
+      </a>
+      <p class="credit-line">Credit required: <span>@sceneagb</span></p>
+    </div>
+  </div>
+  <div class="more-section">
+    <div class="more-heading mono">MORE SCENEPACKS</div>
+    <div class="more-grid" id="moreGrid"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">sceneagb</div>
+  <div class="footer-tag">Premium scenepacks, catalogued for editors.</div>
+  <div class="footer-links">
+    <a href="https://discord.gg/HdQSnmwqVz" target="_blank" rel="noopener">Discord</a>
+    <a href="https://www.instagram.com/sceneagbpriv/" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://www.tiktok.com/@sceneagb" target="_blank" rel="noopener">TikTok</a>
+  </div>
+  <div class="footer-fine">© 2026 sceneagb — fan-run archive, not affiliated with Ariana Grande or her team.</div>
+</footer>
 
 <script>
 
 const grid=document.getElementById("grid")
 const searchInput=document.getElementById("search")
+const statsLine=document.getElementById("statsLine")
+const packCountEl=document.getElementById("packCount")
+const header=document.getElementById("siteHeader")
+const browseView=document.getElementById("browseView")
+const detailView=document.getElementById("detailView")
 
 let packs=[]
 let currentIndex=0
 const packsPerLoad=12
 
-async function loadData(){
-
-const response=await fetch("packs.json")
-packs=await response.json()
-
-loadMore()
-
+function formatTitle(imgPath){
+  let name=imgPath.split("/").pop().replace(/\.(png|jpe?g|gif)$/i,"")
+  name=name.replace(/([a-zA-Z ])0$/,"$1")
+  name=name.replace(/_/g," ").trim()
+  return name
 }
 
-function createCard(pack){
+function linkType(link){
+  return link.includes("/folder/") ? "Folder" : "File"
+}
 
-const card=document.createElement("div")
-card.className="card"
+const KEYWORD_TAGS=[
+  ["interview","Interview"],
+  ["podcast","Podcast"],
+  ["tour","Era"],
+  ["era","Era"],
+  ["press","Press"],
+  ["photoshoot","Photoshoot"],
+  ["performance","Performance"],
+  ["vmas","Performance"],
+  ["fallon","Performance"],
+  ["snl","Performance"],
+  ["seth meyers","Performance"],
+  ["quotidien","Interview"],
+  ["globes","Awards Show"],
+  ["awards","Awards Show"],
+  ["music video","Music Video"],
+  ["movie","Film"]
+]
 
-card.innerHTML=`
-<a href="${pack.link}" target="_blank">
-<img src="${pack.img}">
-</a>
-`
+function guessTag(title){
+  const lower=title.toLowerCase()
+  for(const [kw,tag] of KEYWORD_TAGS){
+    if(lower.includes(kw)) return tag
+  }
+  return "Scenepack"
+}
 
-grid.appendChild(card)
-
+function createCard(pack,idx){
+  const card=document.createElement("div")
+  card.className="card"
+  const title=formatTitle(pack.img)
+  const tag="#"+String(idx+1).padStart(3,"0")
+  card.innerHTML=`
+    <span class="frame-tag mono">${tag}</span>
+    <a href="?pack=${idx}">
+      <img src="${pack.img}" loading="lazy" alt="${title}">
+      <div class="card-overlay">
+        <span class="card-title">${title}</span>
+        <span class="card-open">VIEW&nbsp;&#9656;</span>
+      </div>
+    </a>
+  `
+  grid.appendChild(card)
 }
 
 function loadMore(){
-
-for(let i=0;i<packsPerLoad;i++){
-
-if(currentIndex>=packs.length) return
-
-createCard(packs[currentIndex])
-currentIndex++
-
+  for(let i=0;i<packsPerLoad;i++){
+    if(currentIndex>=packs.length) return
+    createCard(packs[currentIndex],currentIndex)
+    currentIndex++
+  }
 }
 
+function renderDetail(id){
+  const pack=packs[id]
+  if(!pack){
+    detailView.innerHTML=`<a href="/" class="back-link">&#8592; Back to all scenepacks</a><p class="detail-desc">That scenepack couldn't be found.</p>`
+    return
+  }
+
+  const title=formatTitle(pack.img)
+  const tag=guessTag(title)
+  const type=linkType(pack.link)
+
+  document.title=title+" — sceneagb"
+  document.getElementById("detailImg").src=pack.img
+  document.getElementById("detailImg").alt=title
+  document.getElementById("detailTitle").textContent=title
+  document.getElementById("detailDesc").textContent=
+    `${title} — a curated scenepack for editors. Tap download to grab the full ${type.toLowerCase()} from MEGA and drop it straight into your next edit.`
+  document.getElementById("detailMeta").innerHTML=`
+    <div class="meta-row"><span class="meta-label mono">SOURCE</span><span class="meta-value">MEGA</span></div>
+    <div class="meta-row"><span class="meta-label mono">FORMAT</span><span class="meta-value">${type}</span></div>
+  `
+  document.getElementById("detailTags").innerHTML=`
+    <span class="tag-pill">${tag}</span>
+    <span class="tag-pill">scenepack #${String(id+1).padStart(3,"0")}</span>
+  `
+  document.getElementById("detailDownload").href=pack.link
+
+  const moreGrid=document.getElementById("moreGrid")
+  moreGrid.innerHTML=""
+  const others=packs.map((p,i)=>i).filter(i=>i!==id)
+  const picks=[]
+  for(let i=1;i<=others.length && picks.length<3;i++){
+    picks.push(others[(id+i)%others.length])
+  }
+  picks.forEach(i=>{
+    const p=packs[i]
+    const a=document.createElement("a")
+    a.className="more-card"
+    a.href=`?pack=${i}`
+    a.innerHTML=`<img src="${p.img}" loading="lazy" alt="${formatTitle(p.img)}"><div class="more-card-title">${formatTitle(p.img)}</div>`
+    moreGrid.appendChild(a)
+  })
+}
+
+async function loadData(){
+  const response=await fetch("packs.json")
+  packs=await response.json()
+  packCountEl.textContent=packs.length+" packs"
+  statsLine.innerHTML=`<span>${packs.length}</span> scenepacks &middot; updated regularly`
+
+  const params=new URLSearchParams(window.location.search)
+  const packId=params.get("pack")
+
+  if(packId!==null){
+    browseView.style.display="none"
+    detailView.style.display="block"
+    renderDetail(parseInt(packId,10))
+  }else{
+    loadMore()
+  }
 }
 
 window.addEventListener("scroll",()=>{
-
-if(window.innerHeight+window.scrollY>=document.body.offsetHeight-200){
-loadMore()
-}
-
+  if(window.innerHeight+window.scrollY>=document.body.offsetHeight-200){
+    loadMore()
+  }
+  header.classList.toggle("scrolled",window.scrollY>40)
 })
 
 searchInput.addEventListener("input",()=>{
+  const value=searchInput.value.toLowerCase()
 
-const value=searchInput.value.toLowerCase()
+  const filtered=packs
+    .map((p,i)=>({pack:p,idx:i}))
+    .filter(({pack})=>formatTitle(pack.img).toLowerCase().includes(value))
 
-const sorted=[...packs].sort((a,b)=>{
+  grid.innerHTML=""
 
-const aMatch=a.img.toLowerCase().includes(value)
-const bMatch=b.img.toLowerCase().includes(value)
+  if(value===""){
+    currentIndex=0
+    loadMore()
+    return
+  }
 
-if(aMatch&&!bMatch) return -1
-if(!aMatch&&bMatch) return 1
-return 0
+  if(filtered.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks match "${searchInput.value}"</div>`
+    return
+  }
 
+  filtered.forEach(({pack,idx})=>createCard(pack,idx))
 })
 
-grid.innerHTML=""
-sorted.forEach(pack=>createCard(pack))
-
-})
+/* cosmetic playback timecode */
+let secs=0
+setInterval(()=>{
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+  secs=(secs+1)%240
+  const m=String(Math.floor(secs/60)).padStart(2,"0")
+  const s=String(secs%60).padStart(2,"0")
+  const el=document.getElementById("scrubTime")
+  if(el) el.textContent=`${m}:${s}`
+},1000)
 
 loadData()
 
