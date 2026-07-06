@@ -104,31 +104,23 @@ nav.main-nav a.active::after{
 .social-icons{
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:20px;
 }
 
 .social-icons a{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  border:1.5px solid rgba(8,8,12,.45);
   color:#08080c;
-  transition:border-color .25s ease, color .25s ease, background .25s ease;
+  opacity:.85;
+  transition:color .25s ease, opacity .25s ease, transform .2s ease;
 }
 
-.social-icons a:hover{background:rgba(8,8,12,.08);}
+.social-icons a:hover{opacity:1;transform:translateY(-1px);}
 
-.site-header.scrolled .social-icons a{
-  border-color:var(--line);
-  color:var(--text);
-}
+.site-header.scrolled .social-icons a{color:var(--text);}
 
-.site-header.scrolled .social-icons a:hover{background:rgba(255,255,255,.08);}
-
-.social-icons svg{width:17px;height:17px;display:block;}
+.social-icons svg{width:19px;height:19px;display:block;}
 
 /* ---------- HERO ---------- */
 
@@ -247,20 +239,6 @@ nav.main-nav a.active::after{
 }
 
 .card:hover img{filter:saturate(1.05);}
-
-.frame-tag{
-  position:absolute;
-  top:10px; left:10px;
-  z-index:2;
-  font-family:'JetBrains Mono',monospace;
-  font-size:10px;
-  letter-spacing:1px;
-  color:var(--text);
-  background:rgba(12,11,16,.65);
-  padding:3px 7px;
-  border-radius:4px;
-  border:1px solid var(--line);
-}
 
 .card-overlay{
   position:absolute;
@@ -454,15 +432,18 @@ nav.main-nav a.active::after{
 }
 
 .download-icon{
-  width:34px;height:34px;
-  border-radius:50%;
-  background:var(--accent);
+  width:38px;height:38px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--accent-2);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:16px;
   flex-shrink:0;
 }
+
+.download-icon svg{width:18px;height:18px;display:block;}
 
 .download-label{display:block;font-weight:700;font-size:14px;}
 .download-sub{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
@@ -508,13 +489,6 @@ nav.main-nav a.active::after{
 .more-card:hover{transform:translateY(-4px);border-color:rgba(255,255,255,.28);}
 
 .more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
-
-.more-card-title{
-  padding:10px 12px 12px;
-  font-size:12.5px;
-  font-weight:600;
-  text-transform:capitalize;
-}
 
 @media (max-width:768px){
   .detail{padding:120px 18px 50px;}
@@ -644,9 +618,8 @@ footer{
       <h1 class="detail-title" id="detailTitle"></h1>
       <div class="meta-rows" id="detailMeta"></div>
       <div class="tag-row" id="detailTags"></div>
-      <p class="detail-desc" id="detailDesc"></p>
       <a class="download-btn" id="detailDownload" target="_blank" rel="noopener">
-        <span class="download-icon">&#11123;</span>
+        <span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
         <span>
           <span class="download-label">Download on MEGA</span>
           <span class="download-sub">Opens in a new tab</span>
@@ -728,9 +701,7 @@ function createCard(pack,idx){
   const card=document.createElement("div")
   card.className="card"
   const title=formatTitle(pack.img)
-  const tag="#"+String(idx+1).padStart(3,"0")
   card.innerHTML=`
-    <span class="frame-tag mono">${tag}</span>
     <a href="?pack=${idx}">
       <img src="${pack.img}" loading="lazy" alt="${title}">
       <div class="card-overlay">
@@ -765,8 +736,6 @@ function renderDetail(id){
   document.getElementById("detailImg").src=pack.img
   document.getElementById("detailImg").alt=title
   document.getElementById("detailTitle").textContent=title
-  document.getElementById("detailDesc").textContent=
-    `${title} — a curated scenepack for editors. Tap download to grab the full ${type.toLowerCase()} from MEGA and drop it straight into your next edit.`
   const resolution=pack.res||"4K"
   const size=pack.size||"—"
 
@@ -781,7 +750,7 @@ function renderDetail(id){
   document.getElementById("detailTags").innerHTML=`
     <span class="tags-label">${ICON_TAG}</span>
     <span class="tag-pill">${tag}</span>
-    <span class="tag-pill">scenepack #${String(id+1).padStart(3,"0")}</span>
+    <span class="tag-pill">${type.toLowerCase()}</span>
   `
   document.getElementById("detailDownload").href=pack.link
 
@@ -797,7 +766,7 @@ function renderDetail(id){
     const a=document.createElement("a")
     a.className="more-card"
     a.href=`?pack=${i}`
-    a.innerHTML=`<img src="${p.img}" loading="lazy" alt="${formatTitle(p.img)}"><div class="more-card-title">${formatTitle(p.img)}</div>`
+    a.innerHTML=`<img src="${p.img}" loading="lazy" alt="${formatTitle(p.img)}">`
     moreGrid.appendChild(a)
   })
 }
