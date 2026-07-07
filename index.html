@@ -20,12 +20,12 @@
 <style>
 
 :root{
-  --bg:#0c0b10;
-  --surface:#151319;
-  --surface-2:#1d1a24;
-  --line:rgba(255,255,255,.09);
-  --text:#f6f4f9;
-  --text-muted:#948da3;
+  --bg:#18181b;
+  --surface:#222225;
+  --surface-2:#2b2b2f;
+  --line:rgba(255,255,255,.1);
+  --text:#f5f5f4;
+  --text-muted:#a3a3a8;
   --accent:#ff3d7a;
   --accent-2:#c9a47e;
 }
@@ -42,7 +42,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-::selection{background:var(--accent);color:#0c0b10;}
+::selection{background:var(--accent);color:#18181b;}
 
 .mono{font-family:'JetBrains Mono',monospace;}
 
@@ -63,7 +63,7 @@ a{color:inherit;}
 }
 
 .site-header.scrolled{
-  background:rgba(12,11,16,.85);
+  background:rgba(24,24,27,.85);
   backdrop-filter:blur(14px);
   padding:14px 32px;
   border-bottom:1px solid var(--line);
@@ -141,7 +141,7 @@ nav.main-nav a.active::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg, rgba(12,11,16,.15) 0%, rgba(12,11,16,.05) 40%, var(--bg) 100%);
+  background:linear-gradient(180deg, rgba(24,24,27,.15) 0%, rgba(24,24,27,.05) 40%, var(--bg) 100%);
 }
 
 /* ---------- TOOLBAR ---------- */
@@ -243,7 +243,7 @@ nav.main-nav a.active::after{
   position:absolute;
   left:0; right:0; bottom:0;
   padding:14px 12px 12px;
-  background:linear-gradient(0deg, rgba(12,11,16,.95), transparent);
+  background:linear-gradient(0deg, rgba(24,24,27,.95), transparent);
   display:flex;
   flex-direction:column;
   gap:6px;
@@ -493,19 +493,18 @@ nav.main-nav a.active::after{
 
 @media (max-width:768px){
   .detail{padding:88px 16px 40px;}
-  .detail-grid{grid-template-columns:1fr;gap:16px;}
-  .back-link{margin-bottom:16px;}
-  .detail-media{max-width:210px;margin:0 auto;}
-  .detail-title{font-size:30px;margin-bottom:12px;}
+  .detail-grid{grid-template-columns:1fr;gap:14px;}
+  .back-link{margin-bottom:14px;}
+  .detail-media{max-width:270px;margin:0 auto;}
+  .detail-title{font-size:30px;margin-bottom:10px;}
   .detail-eyebrow{margin-bottom:6px;font-size:11px;}
   .meta-rows{gap:8px;margin-bottom:12px;padding-bottom:12px;}
   .meta-row{font-size:12.5px;}
-  .meta-row .meta-label{min-width:130px;}
+  .meta-row .meta-label{min-width:0;}
   .tag-row{margin-bottom:16px;}
-  .detail-info{text-align:center;}
-  .meta-rows,.tag-row{justify-content:center;}
-  .meta-row{justify-content:center;}
-  .tag-row{display:flex;}
+  .detail-info{text-align:left;}
+  .download-btn{display:flex;width:100%;justify-content:center;}
+  .credit-line{text-align:left;}
   .more-grid{grid-template-columns:repeat(2,1fr);}
   .more-card:nth-child(4){display:block;}
 }
@@ -685,7 +684,8 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
 </section>
 
 <footer>
-  <img class="footer-logo-img" src="images/logo.png" alt="sceneagb"
+  <img class="footer-logo-img" id="footerLogo" src="images/logo.png" alt="sceneagb"
+       data-dark="images/logo.png" data-light="images/logo-light.png"
        onerror="this.outerHTML='<div class=&quot;footer-logo&quot;>sceneagb</div>'">
   <div class="footer-tag">Premium scenepacks, catalogued for editors.</div>
   <div class="footer-links">
@@ -922,6 +922,11 @@ loadData()
     document.documentElement.classList.toggle("light",theme==="light")
     btn.innerHTML=theme==="light"?MOON:SUN
     btn.setAttribute("aria-label",theme==="light"?"Switch to dark mode":"Switch to light mode")
+    const logo=document.getElementById("footerLogo")
+    if(logo&&logo.dataset){
+      const target=theme==="light"?logo.dataset.light:logo.dataset.dark
+      if(target&&logo.getAttribute("src")!==target) logo.setAttribute("src",target)
+    }
   }
 
   let saved=null
