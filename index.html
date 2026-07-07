@@ -134,7 +134,7 @@ nav.main-nav a.active::after{
 .hero-bg{
   position:absolute;
   inset:0;
-  background:url("images/banner1.gif") center/cover no-repeat;
+  background:url("images/banner.gif") center/cover no-repeat;
 }
 
 .hero-bg::after{
@@ -233,11 +233,7 @@ nav.main-nav a.active::after{
   aspect-ratio:1/1;
   object-fit:cover;
   display:block;
-  filter:saturate(.92);
-  transition:filter .3s ease;
 }
-
-.card:hover img{filter:saturate(1.05);}
 
 .card-overlay{
   position:absolute;
@@ -578,6 +574,72 @@ footer{
 }
 
 
+
+/* ---------- CATEGORY CHIPS ---------- */
+
+.cat-row{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 32px 6px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.cat-chip{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:.5px;
+  padding:8px 16px;
+  border-radius:100px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:color .2s ease, background .2s ease;
+}
+
+.cat-chip:hover{color:var(--text);}
+
+.cat-chip.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#18181b;
+  font-weight:600;
+}
+
+/* ---------- LOGIN BUTTON ---------- */
+
+.login-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px;
+  border-radius:100px;
+  border:1.5px solid rgba(8,8,12,.45);
+  color:#08080c;
+  font-size:11.5px;
+  font-weight:800;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
+  text-decoration:none;
+  transition:background .25s ease, color .25s ease, border-color .25s ease;
+}
+
+.login-btn:hover{background:rgba(8,8,12,.08);}
+
+.site-header.scrolled .login-btn{
+  border-color:var(--line);
+  color:var(--text);
+}
+
+.site-header.scrolled .login-btn:hover{background:rgba(255,255,255,.08);}
+
+@media (max-width:768px){
+  .cat-row{padding:0 18px 4px;}
+  .login-btn{padding:6px 11px;font-size:10px;}
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
@@ -632,6 +694,7 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
     <a href="https://www.tiktok.com/@sceneagb" target="_blank" rel="noopener" aria-label="TikTok">
       <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
     </a>
+    <a class="login-btn" id="loginBtn" style="display:none" href="/auth/login?redirect=/">Log in</a>
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
   </div>
 </header>
@@ -649,6 +712,8 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   </div>
   <div class="stats" id="statsLine"></div>
 </section>
+
+<div class="cat-row" id="catRow"></div>
 
 <section class="grid" id="grid"></section>
 
@@ -702,9 +767,13 @@ const statsLine=document.getElementById("statsLine")
 const header=document.getElementById("siteHeader")
 const browseView=document.getElementById("browseView")
 const detailView=document.getElementById("detailView")
+const catRow=document.getElementById("catRow")
 
 let packs=[]
-let currentIndex=0
+let categories=[]
+let activeCategory="All"
+let activeList=[]        // [{pack, idx}] currently being shown
+let renderedCount=0
 let forceDarkHeader=false
 const packsPerLoad=12
 
@@ -715,44 +784,59 @@ function formatTitle(imgPath){
   return name
 }
 
+function imgSrc(path){
+  if(!path) return ""
+  if(path.startsWith("http")) return path
+  if(path.startsWith("r2/")) return "/"+path
+  return path
+}
+
+function packTitle(pack){
+  return (pack.title&&pack.title.trim())?pack.title.trim():formatTitle(pack.img)
+}
+
 function linkType(link){
   return link.includes("/folder/") ? "Folder" : "File"
 }
 
 const KEYWORD_TAGS=[
-  ["interview","Interview"],
-  ["podcast","Podcast"],
-  ["tour","Era"],
-  ["era","Era"],
+  ["interview","Interviews"],
+  ["podcast","Podcasts"],
+  ["tour","Eras"],
+  ["era","Eras"],
   ["press","Press"],
-  ["photoshoot","Photoshoot"],
-  ["performance","Performance"],
-  ["vmas","Performance"],
-  ["fallon","Performance"],
-  ["snl","Performance"],
-  ["seth meyers","Performance"],
-  ["quotidien","Interview"],
-  ["globes","Awards Show"],
-  ["awards","Awards Show"],
-  ["music video","Music Video"],
-  ["movie","Film"]
+  ["photoshoot","Photoshoots"],
+  ["performance","Performances"],
+  ["vmas","Performances"],
+  ["fallon","Performances"],
+  ["snl","Performances"],
+  ["seth meyers","Performances"],
+  ["quotidien","Interviews"],
+  ["globes","Awards Shows"],
+  ["awards","Awards Shows"],
+  ["music video","Music Videos"],
+  ["movie","Films"]
 ]
 
-function guessTag(title){
+function guessCategory(title){
   const lower=title.toLowerCase()
   for(const [kw,tag] of KEYWORD_TAGS){
     if(lower.includes(kw)) return tag
   }
-  return "Scenepack"
+  return "Other"
+}
+
+function packCategory(pack){
+  return (pack.category&&pack.category.trim())?pack.category.trim():guessCategory(packTitle(pack))
 }
 
 function createCard(pack,idx){
   const card=document.createElement("div")
   card.className="card"
-  const title=formatTitle(pack.img)
+  const title=packTitle(pack)
   card.innerHTML=`
     <a href="?pack=${idx}">
-      <img src="${pack.img}" loading="lazy" alt="${title}">
+      <img src="${imgSrc(pack.img)}" loading="lazy" alt="${title}">
       <div class="card-overlay">
         <span class="card-title">${title}</span>
         <span class="card-open">VIEW&nbsp;&#9656;</span>
@@ -762,29 +846,70 @@ function createCard(pack,idx){
   grid.appendChild(card)
 }
 
+function computeActiveList(){
+  const q=searchInput.value.toLowerCase()
+  activeList=packs
+    .map((p,i)=>({pack:p,idx:i}))
+    .filter(({pack})=>{
+      const catOk=activeCategory==="All"||packCategory(pack)===activeCategory
+      const searchOk=!q||packTitle(pack).toLowerCase().includes(q)
+      return catOk&&searchOk
+    })
+}
+
+function renderGridReset(){
+  grid.innerHTML=""
+  renderedCount=0
+  if(activeList.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks found</div>`
+    return
+  }
+  loadMore()
+}
+
 function loadMore(){
   for(let i=0;i<packsPerLoad;i++){
-    if(currentIndex>=packs.length) return
-    createCard(packs[currentIndex],currentIndex)
-    currentIndex++
+    if(renderedCount>=activeList.length) return
+    const {pack,idx}=activeList[renderedCount]
+    createCard(pack,idx)
+    renderedCount++
   }
+}
+
+function renderCategories(){
+  let cats=categories.slice()
+  if(cats.length===0){
+    const seen=new Set()
+    packs.forEach(p=>seen.add(packCategory(p)))
+    cats=[...seen].sort()
+  }
+  catRow.innerHTML=""
+  const all=["All",...cats]
+  all.forEach(c=>{
+    const chip=document.createElement("button")
+    chip.className="cat-chip"+(c===activeCategory?" active":"")
+    chip.textContent=c
+    chip.addEventListener("click",()=>{
+      activeCategory=c
+      renderCategories()
+      computeActiveList()
+      renderGridReset()
+    })
+    catRow.appendChild(chip)
+  })
 }
 
 function renderDetail(id){
   const pack=packs[id]
   if(!pack){
-    detailView.innerHTML=`<a href="./" class="back-link">&#8592; Back to all scenepacks</a><p class="detail-desc">That scenepack couldn't be found.</p>`
+    detailView.innerHTML=`<a href="./" class="back-link">&#8592; Back to all scenepacks</a><p style="color:var(--text-muted)">That scenepack couldn't be found.</p>`
     return
   }
 
-  const title=formatTitle(pack.img)
-  const tag=guessTag(title)
+  const title=packTitle(pack)
+  const category=packCategory(pack)
   const type=linkType(pack.link)
-
-  document.title=title+" — sceneagb"
-  document.getElementById("detailImg").src=pack.img
-  document.getElementById("detailImg").alt=title
-  document.getElementById("detailTitle").textContent=title
+  const tags=(pack.tags&&pack.tags.length)?pack.tags:[category]
   const resolution=pack.res||"4K"
   const size=pack.size||"—"
 
@@ -792,37 +917,55 @@ function renderDetail(id){
   const ICON_SIZE=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`
   const ICON_TAG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 12 22 2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><circle cx="7.5" cy="7.5" r="1"/></svg>`
 
+  document.title=title+" — sceneagb"
+  document.getElementById("detailImg").src=imgSrc(pack.img)
+  document.getElementById("detailImg").alt=title
+  document.getElementById("detailTitle").textContent=title
+  document.querySelector(".detail-eyebrow").textContent=category
+
   document.getElementById("detailMeta").innerHTML=`
     <div class="meta-row"><span class="meta-label mono">${ICON_RES} RESOLUTION</span><span class="meta-value">${resolution}</span></div>
     <div class="meta-row"><span class="meta-label mono">${ICON_SIZE} STORAGE SIZE</span><span class="meta-value">${size}</span></div>
   `
   document.getElementById("detailTags").innerHTML=`
     <span class="tags-label">${ICON_TAG}</span>
-    <span class="tag-pill">${tag}</span>
-    <span class="tag-pill">${type.toLowerCase()}</span>
+    ${tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}
   `
   document.getElementById("detailDownload").href=pack.link
 
+  // More from this category (fill with others if needed)
   const moreGrid=document.getElementById("moreGrid")
   moreGrid.innerHTML=""
-  const others=packs.map((p,i)=>i).filter(i=>i!==id)
-  const picks=[]
-  for(let i=1;i<=others.length && picks.length<4;i++){
-    picks.push(others[(id+i)%others.length])
-  }
+  document.querySelector(".more-heading").textContent="MORE FROM "+category.toUpperCase()
+
+  const sameCat=packs.map((p,i)=>i).filter(i=>i!==id&&packCategory(packs[i])===category)
+  const others=packs.map((p,i)=>i).filter(i=>i!==id&&!sameCat.includes(i))
+  const picks=[...sameCat,...others].slice(0,4)
+
   picks.forEach(i=>{
     const p=packs[i]
     const a=document.createElement("a")
     a.className="more-card"
     a.href=`?pack=${i}`
-    a.innerHTML=`<img src="${p.img}" loading="lazy" alt="${formatTitle(p.img)}">`
+    a.innerHTML=`<img src="${imgSrc(p.img)}" loading="lazy" alt="${packTitle(p)}">`
     moreGrid.appendChild(a)
   })
 }
 
 async function loadData(){
-  const response=await fetch("packs.json")
-  packs=await response.json()
+  // Prefer the live API (Cloudflare Pages); fall back to static packs.json
+  try{
+    const res=await fetch("/api/packs")
+    if(!res.ok) throw new Error()
+    const data=await res.json()
+    packs=data.packs||[]
+    categories=data.categories||[]
+  }catch(e){
+    const res=await fetch("packs.json")
+    packs=await res.json()
+    categories=[]
+  }
+
   statsLine.innerHTML=`<span>${packs.length}</span> scenepacks &middot; updated regularly`
 
   const params=new URLSearchParams(window.location.search)
@@ -835,7 +978,9 @@ async function loadData(){
     header.classList.add("scrolled")
     renderDetail(parseInt(packId,10))
   }else{
-    loadMore()
+    renderCategories()
+    computeActiveList()
+    renderGridReset()
     startSearchTypewriter()
   }
 }
@@ -845,7 +990,7 @@ function startSearchTypewriter(){
     searchInput.placeholder="search scenepacks..."
     return
   }
-  const words=packs.slice(0,20).map(p=>`search "${formatTitle(p.img)}"...`)
+  const words=packs.slice(0,20).map(p=>`search "${packTitle(p)}"...`)
   if(words.length===0) return
   let wordIndex=0, charIndex=0, deleting=false
 
@@ -882,28 +1027,35 @@ window.addEventListener("scroll",()=>{
 })
 
 searchInput.addEventListener("input",()=>{
-  const value=searchInput.value.toLowerCase()
-
-  const filtered=packs
-    .map((p,i)=>({pack:p,idx:i}))
-    .filter(({pack})=>formatTitle(pack.img).toLowerCase().includes(value))
-
-  grid.innerHTML=""
-
-  if(value===""){
-    currentIndex=0
-    loadMore()
-    return
-  }
-
-  if(filtered.length===0){
-    grid.innerHTML=`<div class="empty-state">no scenepacks match "${searchInput.value}"</div>`
-    return
-  }
-
-  filtered.forEach(({pack,idx})=>createCard(pack,idx))
+  computeActiveList()
+  renderGridReset()
 })
 
+// ---- account: login button + admin link ----
+async function initAccount(){
+  const btn=document.getElementById("loginBtn")
+  try{
+    const res=await fetch("/api/me")
+    if(!res.ok) throw new Error()
+    const me=await res.json()
+    btn.style.display="inline-flex"
+    if(me.loggedIn){
+      btn.textContent=me.username
+      btn.href="/auth/logout"
+      btn.title="Log out"
+      if(me.isAdmin){
+        document.querySelector("nav.main-nav").insertAdjacentHTML("beforeend",'<a href="admin/">Admin</a>')
+      }
+    }else{
+      btn.textContent="Log in"
+      btn.href="/auth/login?redirect=/"
+    }
+  }catch(e){
+    // static hosting — no backend, keep the button hidden
+  }
+}
+
+initAccount()
 loadData()
 
 </script>
