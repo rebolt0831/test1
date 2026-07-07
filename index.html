@@ -134,7 +134,7 @@ nav.main-nav a.active::after{
 .hero-bg{
   position:absolute;
   inset:0;
-  background:url("images/banner1.gif") center/cover no-repeat;
+  background:url("images/banner.gif") center/cover no-repeat;
 }
 
 .hero-bg::after{
@@ -214,8 +214,7 @@ nav.main-nav a.active::after{
   border-radius:10px;
   overflow:hidden;
   background:var(--surface);
-  border:1px solid var(--line);
-  transition:transform .3s ease, border-color .3s ease;
+  transition:transform .3s ease;
 }
 
 .card:hover{
@@ -310,7 +309,6 @@ nav.main-nav a.active::after{
 .detail-media{
   border-radius:14px;
   overflow:hidden;
-  border:1px solid var(--line);
   background:var(--surface);
 }
 
@@ -483,11 +481,10 @@ nav.main-nav a.active::after{
   border-radius:10px;
   overflow:hidden;
   background:var(--surface);
-  border:1px solid var(--line);
-  transition:transform .3s ease, border-color .3s ease;
+  transition:transform .3s ease;
 }
 
-.more-card:hover{transform:translateY(-4px);border-color:var(--line);}
+.more-card:hover{transform:translateY(-4px);}
 
 .more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
 
