@@ -27,7 +27,7 @@
   --text:#f6f4f9;
   --text-muted:#948da3;
   --accent:#ff3d7a;
-  --accent-2:#b9a6ff;
+  --accent-2:#c9a47e;
 }
 
 *{box-sizing:border-box;}
@@ -476,6 +476,8 @@ nav.main-nav a.active::after{
   gap:20px;
 }
 
+.more-card:nth-child(4){display:none;}
+
 .more-card{
   text-decoration:none;
   color:var(--text);
@@ -494,6 +496,7 @@ nav.main-nav a.active::after{
   .detail{padding:120px 18px 50px;}
   .detail-grid{grid-template-columns:1fr;gap:28px;}
   .more-grid{grid-template-columns:repeat(2,1fr);}
+  .more-card:nth-child(4){display:block;}
 }
 
 /* ---------- FOOTER ---------- */
@@ -503,6 +506,8 @@ footer{
   padding:56px 32px 40px;
   text-align:center;
 }
+
+.footer-logo-img{height:34px;display:block;margin:0 auto;}
 
 .footer-logo{
   font-family:'Bebas Neue',sans-serif;
@@ -549,11 +554,12 @@ footer{
 
 @media (max-width:768px){
 
-  .site-header{padding:16px 18px;}
-  nav.main-nav{gap:18px;}
-  nav.main-nav a{font-size:11px;}
-  .nav-cta span.cta-text{display:none;}
-  .nav-cta{padding:9px 11px;}
+  .site-header{padding:14px 14px;}
+  .site-header.scrolled{padding:10px 14px;}
+  nav.main-nav{gap:12px;}
+  nav.main-nav a{font-size:10.5px;letter-spacing:.8px;padding-bottom:3px;}
+  .social-icons{gap:12px;}
+  .social-icons svg{width:16px;height:16px;}
 
   .hero{height:300px;min-height:0;}
 
@@ -635,7 +641,8 @@ footer{
 </section>
 
 <footer>
-  <div class="footer-logo">sceneagb</div>
+  <img class="footer-logo-img" src="images/logo.png" alt="sceneagb"
+       onerror="this.outerHTML='<div class=&quot;footer-logo&quot;>sceneagb</div>'">
   <div class="footer-tag">Premium scenepacks, catalogued for editors.</div>
   <div class="footer-links">
     <a href="https://discord.gg/HdQSnmwqVz" target="_blank" rel="noopener">Discord</a>
@@ -758,7 +765,7 @@ function renderDetail(id){
   moreGrid.innerHTML=""
   const others=packs.map((p,i)=>i).filter(i=>i!==id)
   const picks=[]
-  for(let i=1;i<=others.length && picks.length<3;i++){
+  for(let i=1;i<=others.length && picks.length<4;i++){
     picks.push(others[(id+i)%others.length])
   }
   picks.forEach(i=>{
