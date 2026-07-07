@@ -118,7 +118,7 @@ nav.main-nav a.active::after{
 .hero-bg{
   position:absolute;
   inset:0;
-  background:url("../images/banner1.gif") center/cover no-repeat;
+  background:url("../images/banner.gif") center/cover no-repeat;
 }
 
 .hero-bg::after{
@@ -265,12 +265,12 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   position:relative;
   border-radius:10px;
   overflow:hidden;
-  background:var(--surface);
-  border:1px solid var(--line);
-  transition:transform .3s ease, border-color .3s ease;
+  background:transparent;
+  border:0;
+  transition:transform .3s ease;
 }
 
-.card:hover{transform:translateY(-4px);border-color:var(--line);}
+.card:hover{transform:translateY(-4px);}
 .card a{display:block;text-decoration:none;position:relative;}
 .card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
 
