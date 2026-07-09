@@ -20,6 +20,7 @@
 <style>
 
 :root{
+  --card-shadow:0 14px 34px rgba(0,0,0,.5);
   --bg:#18181b;
   --surface:#222225;
   --surface-2:#2b2b2f;
@@ -220,6 +221,7 @@ nav.main-nav a.active::after{
 
 .card:hover{
   transform:translateY(-4px);
+  box-shadow:var(--card-shadow);
 }
 
 .card a{
@@ -481,7 +483,7 @@ nav.main-nav a.active::after{
   transition:transform .3s ease;
 }
 
-.more-card:hover{transform:translateY(-4px);}
+.more-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow);}
 
 .more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
 
@@ -606,8 +608,9 @@ footer{
   margin:0 auto;
   padding:0 32px 6px;
   display:none;
-  align-items:center;
-  gap:16px;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
 }
 
 .browse-bar.visible{display:flex;}
@@ -630,8 +633,9 @@ footer{
 
 .browse-title{
   font-family:'Bebas Neue',sans-serif;
-  font-size:26px;
+  font-size:34px;
   letter-spacing:1px;
+  line-height:1;
 }
 
 @media (max-width:768px){
@@ -673,6 +677,7 @@ footer{
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
+  --card-shadow:0 14px 30px rgba(30,22,12,.2);
   --bg:#f7f4ef;
   --surface:#ffffff;
   --surface-2:#efe9e0;
@@ -863,9 +868,13 @@ function packCategory(pack){
   return (pack.category&&pack.category.trim())?pack.category.trim():guessCategory(packTitle(pack))
 }
 
+function normCats(){
+  // categories may be strings (old data) or {name, img}
+  return categories.map(c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}).filter(c=>c.name)
+}
+
 function categoryData(){
-  // ordered categories with counts + a cover image (first pack in each)
-  const order=categories.length?categories.slice():[]
+  const order=normCats()
   const map=new Map()
   packs.forEach((p,i)=>{
     const c=packCategory(p)
@@ -873,7 +882,14 @@ function categoryData(){
     map.get(c).count++
   })
   const out=[]
-  order.forEach(c=>{ if(map.has(c)){ out.push(map.get(c)); map.delete(c) } })
+  order.forEach(c=>{
+    if(map.has(c.name)){
+      const entry=map.get(c.name)
+      if(c.img) entry.cover=c.img   // category's own thumbnail wins
+      out.push(entry)
+      map.delete(c.name)
+    }
+  })
   ;[...map.keys()].sort().forEach(c=>out.push(map.get(c)))
   return out
 }
