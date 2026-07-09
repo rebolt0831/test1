@@ -138,25 +138,32 @@ a{color:inherit;}
 
 /* categories */
 
-.chip-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.cat-list{display:flex;flex-direction:column;gap:12px;}
 
-.chip{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  padding:8px 14px;
-  border-radius:100px;
+.cat-card{
+  display:grid;
+  grid-template-columns:64px 1fr;
+  gap:14px;
+  align-items:start;
   background:var(--surface);
   border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
 }
 
-.chip button{
-  background:none;border:none;cursor:pointer;
-  color:var(--text-muted);font-size:13px;padding:0;line-height:1;
+.cat-thumb{
+  width:64px;height:64px;
+  border-radius:9px;
+  object-fit:cover;
+  background:var(--surface-2);
 }
-.chip button:hover{color:#f87171;}
+
+.cat-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cat-fields .full{grid-column:1/-1;}
+
+@media (max-width:700px){
+  .cat-fields{grid-template-columns:1fr;}
+}
 
 .add-cat{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
 
@@ -285,7 +292,7 @@ input::placeholder{color:var(--text-muted);}
 <div class="wrap" id="panel" style="display:none">
 
   <div class="section-title">Categories</div>
-  <div class="chip-row" id="catList"></div>
+  <div class="cat-list" id="catList"></div>
   <div class="add-cat">
     <input id="newCat" placeholder="new category name e.g. Music Videos" style="min-width:240px">
     <button class="btn btn-ghost" id="addCatBtn">Add category</button>
@@ -339,21 +346,89 @@ function renderCats(){
     catList.innerHTML='<span style="font-size:13px;color:var(--text-muted)">no categories yet — add one below</span>'
   }
   categories.forEach((c,i)=>{
-    const chip=document.createElement("span")
-    chip.className="chip"
-    chip.innerHTML=`${esc(c)} <button title="remove" data-i="${i}">&times;</button>`
-    chip.querySelector("button").addEventListener("click",()=>{
-      categories.splice(i,1)
-      renderCats();renderPacks()
+    const row=document.createElement("div")
+    row.className="cat-card"
+    row.innerHTML=`
+      <img class="cat-thumb" src="${imgSrc(c.img)}" onerror="this.style.opacity=.25">
+      <div class="cat-fields">
+        <div class="field"><label>Name</label><input data-cf="name" data-ci="${i}" value="${esc(c.name)}"></div>
+        <div class="field"><label>Thumbnail path / URL</label>
+          <div style="display:flex;gap:8px">
+            <input data-cf="img" data-ci="${i}" value="${esc(c.img||"")}" placeholder="images/category cover.png" style="flex:1">
+            <button class="btn btn-ghost" data-cupload="${i}" style="padding:9px 14px;font-size:12px;white-space:nowrap">Upload…</button>
+          </div>
+        </div>
+        <div class="full" style="display:flex;justify-content:flex-end">
+          <button class="btn btn-danger" data-cdel="${i}">Delete category</button>
+        </div>
+      </div>
+    `
+    catList.appendChild(row)
+  })
+
+  catList.querySelectorAll("input").forEach(el=>{
+    el.addEventListener("input",()=>{
+      const i=+el.dataset.ci, f=el.dataset.cf
+      if(f==="name"){
+        const oldName=categories[i].name
+        categories[i].name=el.value
+        // keep packs pointing at the renamed category
+        packs.forEach(p=>{if(p.category===oldName)p.category=el.value})
+      }else{
+        categories[i][f]=el.value
+        const img=el.closest(".cat-card").querySelector(".cat-thumb")
+        img.style.opacity=1
+        img.src=imgSrc(el.value)
+      }
     })
-    catList.appendChild(chip)
+  })
+
+  catList.querySelectorAll("[data-cupload]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i=+btn.dataset.cupload
+      const picker=document.createElement("input")
+      picker.type="file"
+      picker.accept="image/png,image/jpeg,image/gif,image/webp"
+      picker.addEventListener("change",async()=>{
+        const file=picker.files[0]
+        if(!file) return
+        btn.disabled=true
+        btn.textContent="Uploading…"
+        try{
+          const fd=new FormData()
+          fd.append("file",file)
+          const res=await fetch("/api/admin/upload",{method:"POST",body:fd})
+          const data=await res.json()
+          if(res.ok&&data.ok){
+            categories[i].img=data.path
+            renderCats()
+          }else{
+            alert(data.error||"Upload failed.")
+          }
+        }catch(e){
+          alert("Upload failed — connection error.")
+        }
+        btn.disabled=false
+        btn.textContent="Upload…"
+      })
+      picker.click()
+    })
+  })
+
+  catList.querySelectorAll("[data-cdel]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      if(confirm("Delete this category? Packs keep working, they just show under an auto-guessed category. (Not final until Save)")){
+        categories.splice(+btn.dataset.cdel,1)
+        renderCats();renderPacks()
+      }
+    })
   })
 }
 
 function catOptions(selected){
   let out='<option value="">— none —</option>'
   categories.forEach(c=>{
-    out+=`<option value="${esc(c)}" ${c===selected?"selected":""}>${esc(c)}</option>`
+    out+=`<option value="${esc(c.name)}" ${c.name===selected?"selected":""}>${esc(c.name)}</option>`
   })
   return out
 }
@@ -447,7 +522,7 @@ function renderPacks(){
 document.getElementById("addCatBtn").addEventListener("click",()=>{
   const v=document.getElementById("newCat").value.trim()
   if(!v)return
-  if(!categories.includes(v))categories.push(v)
+  if(!categories.some(c=>c.name===v))categories.push({name:v,img:""})
   document.getElementById("newCat").value=""
   renderCats();renderPacks()
 })
@@ -527,7 +602,7 @@ async function init(){
     img:p.img||"",link:p.link||"",title:p.title||"",
     category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||""
   }))
-  categories=data.categories||[]
+  categories=(data.categories||[]).map(c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}).filter(c=>c.name)
 
   panel.style.display="block"
   savebar.style.display="flex"
