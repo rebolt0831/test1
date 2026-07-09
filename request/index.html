@@ -36,6 +36,8 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
+::selection{background:var(--accent-2);color:#18181b;}
+
 .mono{font-family:'JetBrains Mono',monospace;}
 a{color:inherit;}
 
@@ -570,6 +572,11 @@ init()
       btn.textContent=me.username
       btn.href="/auth/logout"
       btn.title="Log out"
+      const nav=document.querySelector("nav.main-nav")
+      const aboutLink=nav.querySelector('a[href*="about"]')||nav.lastElementChild
+      if(!nav.querySelector('a[href*="request"]')){
+        aboutLink.insertAdjacentHTML("beforebegin",'<a href="./">Request</a>')
+      }
       if(me.isAdmin){
         document.querySelector("nav.main-nav").insertAdjacentHTML("beforeend",'<a href="../admin/">Admin</a>')
       }
