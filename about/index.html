@@ -36,6 +36,8 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
+::selection{background:var(--accent-2);color:#18181b;}
+
 .mono{font-family:'JetBrains Mono',monospace;}
 a{color:inherit;}
 
@@ -304,7 +306,6 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   <nav class="main-nav">
     <a href="../">Home</a>
     <a href="../exclusive/">Exclusive</a>
-    <a href="../request/">Request</a>
     <a href="./" class="active">About</a>
   </nav>
   <div class="social-icons">
@@ -407,6 +408,11 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
       btn.textContent=me.username
       btn.href="/auth/logout"
       btn.title="Log out"
+      const nav=document.querySelector("nav.main-nav")
+      const aboutLink=nav.querySelector('a[href*="about"]')||nav.lastElementChild
+      if(!nav.querySelector('a[href*="request"]')){
+        aboutLink.insertAdjacentHTML("beforebegin",'<a href="../request/">Request</a>')
+      }
       if(me.isAdmin){
         document.querySelector("nav.main-nav").insertAdjacentHTML("beforeend",'<a href="../admin/">Admin</a>')
       }
