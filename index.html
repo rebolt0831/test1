@@ -42,7 +42,7 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-::selection{background:var(--accent);color:#18181b;}
+::selection{background:var(--accent-2);color:#18181b;}
 
 .mono{font-family:'JetBrains Mono',monospace;}
 
@@ -575,37 +575,68 @@ footer{
 
 
 
-/* ---------- CATEGORY CHIPS ---------- */
 
-.cat-row{
+
+/* category cards: overlay always visible */
+.card.cat-card .card-overlay{
+  opacity:1;
+  transform:none;
+  padding:16px 14px 14px;
+}
+
+.cat-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;
+  letter-spacing:1px;
+  color:#f6f4f9;
+  line-height:1;
+}
+
+.cat-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--accent-2);
+  margin-top:6px;
+  display:block;
+}
+
+/* browse bar (back to categories + current category title) */
+.browse-bar{
   max-width:1200px;
   margin:0 auto;
   padding:0 32px 6px;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+  display:none;
+  align-items:center;
+  gap:16px;
 }
 
-.cat-chip{
-  font-family:'JetBrains Mono',monospace;
-  font-size:12px;
-  letter-spacing:.5px;
-  padding:8px 16px;
-  border-radius:100px;
-  background:var(--surface);
-  border:1px solid var(--line);
+.browse-bar.visible{display:flex;}
+
+.browse-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
   color:var(--text-muted);
+  font-size:13px;
   cursor:pointer;
-  transition:color .2s ease, background .2s ease;
+  background:none;border:none;
+  font-family:'Inter',sans-serif;
+  padding:0;
+  transition:color .2s ease;
 }
 
-.cat-chip:hover{color:var(--text);}
+.browse-back:hover{color:var(--text);}
 
-.cat-chip.active{
-  background:var(--accent);
-  border-color:var(--accent);
-  color:#18181b;
-  font-weight:600;
+.browse-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:26px;
+  letter-spacing:1px;
+}
+
+@media (max-width:768px){
+  .browse-bar{padding:0 18px 4px;}
+  .cat-name{font-size:18px;}
 }
 
 /* ---------- LOGIN BUTTON ---------- */
@@ -636,7 +667,6 @@ footer{
 .site-header.scrolled .login-btn:hover{background:rgba(255,255,255,.08);}
 
 @media (max-width:768px){
-  .cat-row{padding:0 18px 4px;}
   .login-btn{padding:6px 11px;font-size:10px;}
 }
 
@@ -681,7 +711,6 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   <nav class="main-nav">
     <a href="./" class="active">Home</a>
     <a href="exclusive/">Exclusive</a>
-    <a href="request/">Request</a>
     <a href="about/">About</a>
   </nav>
   <div class="social-icons">
@@ -713,7 +742,10 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   <div class="stats" id="statsLine"></div>
 </section>
 
-<div class="cat-row" id="catRow"></div>
+<div class="browse-bar" id="browseBar">
+  <button class="browse-back" id="browseBack">&#8592; All categories</button>
+  <span class="browse-title" id="browseTitle"></span>
+</div>
 
 <section class="grid" id="grid"></section>
 
@@ -767,12 +799,13 @@ const statsLine=document.getElementById("statsLine")
 const header=document.getElementById("siteHeader")
 const browseView=document.getElementById("browseView")
 const detailView=document.getElementById("detailView")
-const catRow=document.getElementById("catRow")
+const browseBar=document.getElementById("browseBar")
+const browseTitle=document.getElementById("browseTitle")
 
 let packs=[]
 let categories=[]
-let activeCategory="All"
-let activeList=[]        // [{pack, idx}] currently being shown
+let currentCat=null      // null = category grid; string = packs of that category
+let activeList=[]        // [{pack, idx}] of packs being shown
 let renderedCount=0
 let forceDarkHeader=false
 const packsPerLoad=12
@@ -830,7 +863,29 @@ function packCategory(pack){
   return (pack.category&&pack.category.trim())?pack.category.trim():guessCategory(packTitle(pack))
 }
 
-function createCard(pack,idx){
+function categoryData(){
+  // ordered categories with counts + a cover image (first pack in each)
+  const order=categories.length?categories.slice():[]
+  const map=new Map()
+  packs.forEach((p,i)=>{
+    const c=packCategory(p)
+    if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img})
+    map.get(c).count++
+  })
+  const out=[]
+  order.forEach(c=>{ if(map.has(c)){ out.push(map.get(c)); map.delete(c) } })
+  ;[...map.keys()].sort().forEach(c=>out.push(map.get(c)))
+  return out
+}
+
+function updateStats(){
+  const catCount=categoryData().length
+  statsLine.innerHTML=`<span>${catCount}</span> categories &middot; <span>${packs.length}</span> scenepacks`
+}
+
+/* ---------- rendering ---------- */
+
+function createPackCard(pack,idx){
   const card=document.createElement("div")
   card.className="card"
   const title=packTitle(pack)
@@ -846,22 +901,58 @@ function createCard(pack,idx){
   grid.appendChild(card)
 }
 
-function computeActiveList(){
-  const q=searchInput.value.toLowerCase()
-  activeList=packs
-    .map((p,i)=>({pack:p,idx:i}))
-    .filter(({pack})=>{
-      const catOk=activeCategory==="All"||packCategory(pack)===activeCategory
-      const searchOk=!q||packTitle(pack).toLowerCase().includes(q)
-      return catOk&&searchOk
-    })
+function createCategoryCard(cat){
+  const card=document.createElement("div")
+  card.className="card cat-card"
+  card.innerHTML=`
+    <a href="?cat=${encodeURIComponent(cat.name)}">
+      <img src="${imgSrc(cat.cover)}" loading="lazy" alt="${cat.name}">
+      <div class="card-overlay">
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${cat.count} scenepack${cat.count===1?"":"s"}</span>
+      </div>
+    </a>
+  `
+  grid.appendChild(card)
 }
 
-function renderGridReset(){
+function showCategories(){
+  currentCat=null
+  browseBar.classList.remove("visible")
+  grid.innerHTML=""
+  renderedCount=0
+  activeList=[]
+  const cats=categoryData()
+  if(cats.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks yet</div>`
+    return
+  }
+  cats.forEach(createCategoryCard)
+}
+
+function showCategoryPacks(cat){
+  currentCat=cat
+  browseBar.classList.add("visible")
+  browseTitle.textContent=cat
+  activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat)
   grid.innerHTML=""
   renderedCount=0
   if(activeList.length===0){
-    grid.innerHTML=`<div class="empty-state">no scenepacks found</div>`
+    grid.innerHTML=`<div class="empty-state">nothing in this category yet</div>`
+    return
+  }
+  loadMore()
+}
+
+function showSearchResults(q){
+  browseBar.classList.add("visible")
+  browseTitle.textContent='results for "'+q+'"'
+  activeList=packs.map((p,i)=>({pack:p,idx:i}))
+    .filter(({pack})=>packTitle(pack).toLowerCase().includes(q.toLowerCase()))
+  grid.innerHTML=""
+  renderedCount=0
+  if(activeList.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks match "${q}"</div>`
     return
   }
   loadMore()
@@ -871,33 +962,18 @@ function loadMore(){
   for(let i=0;i<packsPerLoad;i++){
     if(renderedCount>=activeList.length) return
     const {pack,idx}=activeList[renderedCount]
-    createCard(pack,idx)
+    createPackCard(pack,idx)
     renderedCount++
   }
 }
 
-function renderCategories(){
-  let cats=categories.slice()
-  if(cats.length===0){
-    const seen=new Set()
-    packs.forEach(p=>seen.add(packCategory(p)))
-    cats=[...seen].sort()
-  }
-  catRow.innerHTML=""
-  const all=["All",...cats]
-  all.forEach(c=>{
-    const chip=document.createElement("button")
-    chip.className="cat-chip"+(c===activeCategory?" active":"")
-    chip.textContent=c
-    chip.addEventListener("click",()=>{
-      activeCategory=c
-      renderCategories()
-      computeActiveList()
-      renderGridReset()
-    })
-    catRow.appendChild(chip)
-  })
-}
+document.getElementById("browseBack").addEventListener("click",()=>{
+  searchInput.value=""
+  history.replaceState(null,"",window.location.pathname)
+  showCategories()
+})
+
+/* ---------- detail ---------- */
 
 function renderDetail(id){
   const pack=packs[id]
@@ -923,6 +999,10 @@ function renderDetail(id){
   document.getElementById("detailTitle").textContent=title
   document.querySelector(".detail-eyebrow").textContent=category
 
+  // back link returns to this pack's category
+  document.querySelector("#detailView .back-link").href="?cat="+encodeURIComponent(category)
+  document.querySelector("#detailView .back-link").innerHTML="&#8592; Back to "+category
+
   document.getElementById("detailMeta").innerHTML=`
     <div class="meta-row"><span class="meta-label mono">${ICON_RES} RESOLUTION</span><span class="meta-value">${resolution}</span></div>
     <div class="meta-row"><span class="meta-label mono">${ICON_SIZE} STORAGE SIZE</span><span class="meta-value">${size}</span></div>
@@ -933,7 +1013,6 @@ function renderDetail(id){
   `
   document.getElementById("detailDownload").href=pack.link
 
-  // More from this category (fill with others if needed)
   const moreGrid=document.getElementById("moreGrid")
   moreGrid.innerHTML=""
   document.querySelector(".more-heading").textContent="MORE FROM "+category.toUpperCase()
@@ -952,8 +1031,9 @@ function renderDetail(id){
   })
 }
 
+/* ---------- boot ---------- */
+
 async function loadData(){
-  // Prefer the live API (Cloudflare Pages); fall back to static packs.json
   try{
     const res=await fetch("/api/packs")
     if(!res.ok) throw new Error()
@@ -966,10 +1046,11 @@ async function loadData(){
     categories=[]
   }
 
-  statsLine.innerHTML=`<span>${packs.length}</span> scenepacks &middot; updated regularly`
+  updateStats()
 
   const params=new URLSearchParams(window.location.search)
   const packId=params.get("pack")
+  const cat=params.get("cat")
 
   if(packId!==null){
     browseView.style.display="none"
@@ -977,12 +1058,15 @@ async function loadData(){
     forceDarkHeader=true
     header.classList.add("scrolled")
     renderDetail(parseInt(packId,10))
-  }else{
-    renderCategories()
-    computeActiveList()
-    renderGridReset()
-    startSearchTypewriter()
+    return
   }
+
+  if(cat){
+    showCategoryPacks(cat)
+  }else{
+    showCategories()
+  }
+  startSearchTypewriter()
 }
 
 function startSearchTypewriter(){
@@ -1027,11 +1111,17 @@ window.addEventListener("scroll",()=>{
 })
 
 searchInput.addEventListener("input",()=>{
-  computeActiveList()
-  renderGridReset()
+  const q=searchInput.value.trim()
+  if(q){
+    showSearchResults(q)
+  }else if(currentCat){
+    showCategoryPacks(currentCat)
+  }else{
+    showCategories()
+  }
 })
 
-// ---- account: login button + admin link ----
+// ---- account: login button + hidden nav links ----
 async function initAccount(){
   const btn=document.getElementById("loginBtn")
   try{
@@ -1039,19 +1129,24 @@ async function initAccount(){
     if(!res.ok) throw new Error()
     const me=await res.json()
     btn.style.display="inline-flex"
+    const nav=document.querySelector("nav.main-nav")
+    const aboutLink=nav.querySelector('a[href*="about"]')
     if(me.loggedIn){
       btn.textContent=me.username
       btn.href="/auth/logout"
       btn.title="Log out"
+      if(!nav.querySelector('a[href*="request"]')){
+        aboutLink.insertAdjacentHTML("beforebegin",'<a href="request/">Request</a>')
+      }
       if(me.isAdmin){
-        document.querySelector("nav.main-nav").insertAdjacentHTML("beforeend",'<a href="admin/">Admin</a>')
+        nav.insertAdjacentHTML("beforeend",'<a href="admin/">Admin</a>')
       }
     }else{
       btn.textContent="Log in"
       btn.href="/auth/login?redirect=/"
     }
   }catch(e){
-    // static hosting — no backend, keep the button hidden
+    // static hosting — no backend
   }
 }
 
