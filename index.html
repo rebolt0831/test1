@@ -488,7 +488,7 @@ nav.main-nav a.active::after{
 .more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
 
 @media (max-width:768px){
-  .detail{padding:88px 16px 40px;}
+  .detail{padding:64px 16px 40px;}
   .detail-grid{grid-template-columns:1fr;gap:14px;}
   .back-link{margin-bottom:14px;}
   .detail-media{max-width:none;margin:0;}
@@ -674,6 +674,83 @@ footer{
   .login-btn{padding:6px 11px;font-size:10px;}
 }
 
+
+/* ---------- MOBILE MENU (hamburger + left drawer) ---------- */
+
+.menu-btn{
+  display:none;
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:6px 4px;
+  flex-direction:column;
+  gap:5px;
+}
+
+.menu-btn span{
+  display:block;
+  width:22px;
+  height:2.5px;
+  border-radius:2px;
+  background:#08080c;
+  transition:background .25s ease;
+}
+
+.site-header.scrolled .menu-btn span{background:var(--text);}
+
+.drawer{
+  position:fixed;
+  top:0; left:0; bottom:0;
+  width:260px;
+  background:var(--bg);
+  border-right:1px solid var(--line);
+  z-index:220;
+  transform:translateX(-100%);
+  transition:transform .3s ease;
+  padding:76px 28px 30px;
+  display:flex;
+  flex-direction:column;
+  gap:34px;
+}
+
+.drawer.open{transform:translateX(0);}
+
+.drawer-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.55);
+  z-index:210;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+}
+
+.drawer-overlay.visible{opacity:1;pointer-events:auto;}
+
+.drawer-nav{display:flex;flex-direction:column;gap:20px;}
+
+.drawer-nav a{
+  text-decoration:none;
+  color:var(--text);
+  font-weight:800;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-size:15px;
+}
+
+.drawer-nav a.active{color:var(--accent-2);}
+.drawer-nav a::after{display:none;}
+
+.drawer-socials{display:flex;gap:24px;}
+.drawer-socials a{color:var(--text);display:inline-flex;}
+.drawer-socials svg{width:20px;height:20px;display:block;}
+
+@media (max-width:768px){
+  .menu-btn{display:flex;}
+  nav.main-nav{display:none;}
+  .social-icons a[aria-label]{display:none;}
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
@@ -713,6 +790,7 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
 <body>
 
 <header class="site-header" id="siteHeader">
+  <button class="menu-btn" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
   <nav class="main-nav">
     <a href="./" class="active">Home</a>
     <a href="exclusive/">Exclusive</a>
@@ -732,6 +810,13 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
     <button class="theme-toggle" id="themeToggle" aria-label="Switch to light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
   </div>
 </header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-nav" id="drawerNav"></div>
+  <div class="drawer-socials" id="drawerSocials"></div>
+</div>
+
 
 <div id="browseView">
 
@@ -894,9 +979,15 @@ function categoryData(){
   return out
 }
 
-function updateStats(){
-  const catCount=categoryData().length
-  statsLine.innerHTML=`<span>${catCount}</span> categories &middot; <span>${packs.length}</span> scenepacks`
+function updateStats(mode,count,label){
+  if(mode==="category"){
+    statsLine.innerHTML=`<span>${count}</span> scenepack${count===1?"":"s"} in ${label}`
+  }else if(mode==="search"){
+    statsLine.innerHTML=`<span>${count}</span> result${count===1?"":"s"}`
+  }else{
+    const catCount=categoryData().length
+    statsLine.innerHTML=`<span>${catCount}</span> categories &middot; <span>${packs.length}</span> scenepacks`
+  }
 }
 
 /* ---------- rendering ---------- */
@@ -934,6 +1025,7 @@ function createCategoryCard(cat){
 
 function showCategories(){
   currentCat=null
+  updateStats()
   browseBar.classList.remove("visible")
   grid.innerHTML=""
   renderedCount=0
@@ -951,6 +1043,7 @@ function showCategoryPacks(cat){
   browseBar.classList.add("visible")
   browseTitle.textContent=cat
   activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat)
+  updateStats("category",activeList.length,cat)
   grid.innerHTML=""
   renderedCount=0
   if(activeList.length===0){
@@ -965,6 +1058,7 @@ function showSearchResults(q){
   browseTitle.textContent='results for "'+q+'"'
   activeList=packs.map((p,i)=>({pack:p,idx:i}))
     .filter(({pack})=>packTitle(pack).toLowerCase().includes(q.toLowerCase()))
+  updateStats("search",activeList.length)
   grid.innerHTML=""
   renderedCount=0
   if(activeList.length===0){
@@ -1199,6 +1293,34 @@ loadData()
     try{localStorage.setItem("sceneagb-theme",next)}catch(e){}
     apply(next)
   })
+})()
+</script>
+
+<script>
+(function(){
+  const btn=document.getElementById("menuBtn")
+  const drawer=document.getElementById("drawer")
+  const overlay=document.getElementById("drawerOverlay")
+  if(!btn||!drawer||!overlay) return
+
+  function openDrawer(){
+    // clone fresh each time so injected links (Request/Admin) are included
+    document.getElementById("drawerNav").innerHTML=document.querySelector("nav.main-nav").innerHTML
+    const s=document.getElementById("drawerSocials")
+    s.innerHTML=""
+    document.querySelectorAll(".social-icons a[aria-label]").forEach(a=>s.appendChild(a.cloneNode(true)))
+    drawer.classList.add("open")
+    overlay.classList.add("visible")
+  }
+
+  function closeDrawer(){
+    drawer.classList.remove("open")
+    overlay.classList.remove("visible")
+  }
+
+  btn.addEventListener("click",openDrawer)
+  overlay.addEventListener("click",closeDrawer)
+  drawer.addEventListener("click",e=>{ if(e.target.closest("a")) closeDrawer() })
 })()
 </script>
 </body>
