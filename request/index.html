@@ -645,8 +645,8 @@ async function init(){
 
   if(!me.hasAccess){
     gatePanel.style.display="block"
-    gateTitle.textContent="Role required"
-    gateText.textContent="You're logged in as "+me.username+", but requests are for members with a role in the sceneagb Discord. Grab a role in the server, then log in again."
+    gateTitle.textContent="Verified members only"
+    gateText.textContent="You're logged in as "+me.username+", but requests are for verified members of the sceneagb Discord. Get verified in the server, then log out and back in here."
     return
   }
 
