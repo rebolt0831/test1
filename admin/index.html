@@ -95,6 +95,28 @@ a{color:inherit;}
 
 .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 120px;}
 
+.tabs{display:flex;gap:8px;margin-top:6px;}
+
+.tab{
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text-muted);
+  padding:10px 20px;
+  border-radius:100px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  transition:color .2s ease, background .2s ease;
+}
+
+.tab.active{background:var(--accent);border-color:var(--accent);color:#18181b;}
+
+.danger-link{
+  background:none;border:none;cursor:pointer;
+  color:#f87171;font-size:12px;font-weight:600;
+  padding:0;margin-left:14px;
+}
+
 .section-title{
   font-family:'JetBrains Mono',monospace;
   font-size:12px;
@@ -291,7 +313,12 @@ input::placeholder{color:var(--text-muted);}
 <!-- panel -->
 <div class="wrap" id="panel" style="display:none">
 
-  <div class="section-title">Categories</div>
+  <div class="tabs">
+    <button class="tab active" id="tabMain">Main site</button>
+    <button class="tab" id="tabExclusive">Exclusive</button>
+  </div>
+
+  <div class="section-title">Categories <button class="danger-link" id="delAllCats">delete all</button></div>
   <div class="cat-list" id="catList"></div>
   <div class="add-cat">
     <input id="newCat" placeholder="new category name e.g. Music Videos" style="min-width:240px">
@@ -303,7 +330,7 @@ input::placeholder{color:var(--text-muted);}
   <div class="pack-list" id="packList"></div>
 
   <div class="hint">
-    <strong>Thumbnails — three ways:</strong> hit <code>Upload…</code> to upload straight from your device (needs R2 set up, see SETUP.md), or put the file in the repo's <code>images/</code> folder and type the path like <code>images/my pack0.png</code>, or paste any full https image URL. Changes only go live after you hit <strong>Save all changes</strong>.
+    <strong>Tabs:</strong> "Main site" edits the public archive; "Exclusive" edits the booster-only page — each has its own packs and categories, and one Save stores both.<br><br><strong>Thumbnails — three ways:</strong> hit <code>Upload…</code> to upload straight from your device (needs R2 set up, see SETUP.md), or put the file in the repo's <code>images/</code> folder and type the path like <code>images/my pack0.png</code>, or paste any full https image URL. Changes only go live after you hit <strong>Save all changes</strong>.
   </div>
 
 </div>
@@ -328,8 +355,22 @@ const catList=document.getElementById("catList")
 const packList=document.getElementById("packList")
 const saveStatus=document.getElementById("saveStatus")
 
-let categories=[]
-let packs=[]
+let data={
+  main:{packs:[],categories:[]},
+  exclusive:{packs:[],categories:[]}
+}
+let activeTab="main"
+let categories=data.main.categories
+let packs=data.main.packs
+
+function switchTab(tab){
+  activeTab=tab
+  packs=data[tab].packs
+  categories=data[tab].categories
+  document.getElementById("tabMain").classList.toggle("active",tab==="main")
+  document.getElementById("tabExclusive").classList.toggle("active",tab==="exclusive")
+  renderCats();renderPacks()
+}
 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
 
@@ -519,6 +560,17 @@ function renderPacks(){
   })
 }
 
+document.getElementById("tabMain").addEventListener("click",()=>switchTab("main"))
+document.getElementById("tabExclusive").addEventListener("click",()=>switchTab("exclusive"))
+
+document.getElementById("delAllCats").addEventListener("click",()=>{
+  if(categories.length===0) return
+  if(confirm("Delete ALL categories on this tab? Packs keep their category text but it will show under Other until you make new categories. (Not final until Save)")){
+    categories.length=0
+    renderCats();renderPacks()
+  }
+})
+
 document.getElementById("addCatBtn").addEventListener("click",()=>{
   const v=document.getElementById("newCat").value.trim()
   if(!v)return
@@ -538,7 +590,7 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
   saveStatus.className="status"
   saveStatus.textContent=""
 
-  const bad=packs.find(p=>!p.img.trim()||!p.link.trim())
+  const bad=[...data.main.packs,...data.exclusive.packs].find(p=>!p.img.trim()||!p.link.trim())
   if(bad){
     saveStatus.classList.add("err")
     saveStatus.textContent="Every pack needs an image and a link."
@@ -551,7 +603,12 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
     const res=await fetch("/api/admin/save",{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({packs,categories})
+      body:JSON.stringify({
+        packs:data.main.packs,
+        categories:data.main.categories,
+        exclusivePacks:data.exclusive.packs,
+        exclusiveCategories:data.exclusive.categories
+      })
     })
     const data=await res.json()
     if(res.ok&&data.ok){
@@ -596,13 +653,27 @@ async function init(){
   document.getElementById("adminName").textContent=me.username
   topbarRight.style.display="flex"
 
-  const res=await fetch("/api/packs")
-  const data=await res.json()
-  packs=(data.packs||[]).map(p=>({
+  const normPack=p=>({
     img:p.img||"",link:p.link||"",title:p.title||"",
     category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||""
-  }))
-  categories=(data.categories||[]).map(c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}).filter(c=>c.name)
+  })
+  const normCat=c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}
+
+  const res=await fetch("/api/packs")
+  const mainData=await res.json()
+  data.main.packs.push(...(mainData.packs||[]).map(normPack))
+  data.main.categories.push(...(mainData.categories||[]).map(normCat).filter(c=>c.name))
+
+  try{
+    const res2=await fetch("/api/exclusive-packs")
+    if(res2.ok){
+      const exData=await res2.json()
+      const exPacks=Array.isArray(exData)?exData:(exData.packs||[])
+      const exCats=Array.isArray(exData)?[]:(exData.categories||[])
+      data.exclusive.packs.push(...exPacks.map(normPack))
+      data.exclusive.categories.push(...exCats.map(normCat).filter(c=>c.name))
+    }
+  }catch(e){}
 
   panel.style.display="block"
   savebar.style.display="flex"
