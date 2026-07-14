@@ -969,17 +969,23 @@ footer{
 .gate-fine a{color:var(--boost);}
 
 .user-bar{
+  max-width:1200px;
+  margin:0 auto;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
   gap:14px;
-  padding:52px 20px 0;
+  padding:26px 32px 0;
   font-size:13px;
   color:var(--text-muted);
   flex-wrap:wrap;
 }
 
-#unlockedView .toolbar{padding-top:52px;}
+#unlockedView .toolbar{padding-top:14px;}
+
+@media (max-width:768px){
+  .user-bar{padding:20px 18px 0;}
+}
 
 .user-bar .badge{
   font-family:'JetBrains Mono',monospace;
