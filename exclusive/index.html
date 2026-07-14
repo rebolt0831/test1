@@ -1490,6 +1490,14 @@ async function loadData(){
 
   if(cat){
     showCategoryPacks(cat)
+    // start the page with the search + packs in view (banner just peeking)
+    requestAnimationFrame(()=>{
+      const toolbar=document.querySelector(".toolbar")
+      if(toolbar){
+        const y=toolbar.getBoundingClientRect().top+window.scrollY-84
+        window.scrollTo({top:Math.max(y,0),behavior:"instant"})
+      }
+    })
   }else{
     showCategories()
   }
