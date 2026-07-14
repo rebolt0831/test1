@@ -5,16 +5,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+
 <title>Exclusive — sceneagb</title>
-<meta name="description" content="Exclusive sceneagb scenepacks for verified Discord members.">
+
+<meta name="description" content="Exclusive sceneagb scenepacks for server boosters.">
+<meta name="author" content="sceneagb">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
+  --card-shadow:0 14px 34px rgba(0,0,0,.5);
   --bg:#18181b;
   --surface:#222225;
   --surface-2:#2b2b2f;
@@ -23,10 +27,11 @@
   --text-muted:#a3a3a8;
   --accent:#ff3d7a;
   --accent-2:#c9a47e;
-  --discord:#5865F2;
 }
 
 *{box-sizing:border-box;}
+
+html{scroll-behavior:smooth;}
 
 body{
   margin:0;
@@ -39,9 +44,10 @@ body{
 ::selection{background:var(--accent-2);color:#18181b;}
 
 .mono{font-family:'JetBrains Mono',monospace;}
+
 a{color:inherit;}
 
-/* header: bold dark text over the white banner, flips light on scroll */
+/* ---------- HEADER / NAV ---------- */
 
 .site-header{
   position:fixed;
@@ -62,7 +68,10 @@ a{color:inherit;}
   border-bottom:1px solid var(--line);
 }
 
-nav.main-nav{display:flex;gap:34px;}
+nav.main-nav{
+  display:flex;
+  gap:34px;
+}
 
 nav.main-nav a{
   text-decoration:none;
@@ -91,7 +100,11 @@ nav.main-nav a.active::after{
 .site-header.scrolled nav.main-nav a:hover,
 .site-header.scrolled nav.main-nav a.active{color:var(--text);}
 
-.social-icons{display:flex;align-items:center;gap:20px;}
+.social-icons{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
 
 .social-icons a{
   display:inline-flex;
@@ -108,7 +121,7 @@ nav.main-nav a.active::after{
 
 .social-icons svg{width:19px;height:19px;display:block;}
 
-/* banner */
+/* ---------- HERO ---------- */
 
 .hero{
   position:relative;
@@ -127,192 +140,73 @@ nav.main-nav a.active::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg, rgba(24,24,27,.1) 0%, rgba(24,24,27,.02) 40%, var(--bg) 100%);
+  background:linear-gradient(180deg, rgba(24,24,27,.15) 0%, rgba(24,24,27,.05) 40%, var(--bg) 100%);
 }
 
-.page-head{
-  max-width:900px;
+/* ---------- TOOLBAR ---------- */
+
+.toolbar{
+  max-width:1200px;
   margin:0 auto;
-  padding:44px 32px 10px;
-  text-align:center;
-}
-
-.page-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(48px,9vw,88px);
-  letter-spacing:2px;
-  margin:0;
-}
-
-.page-sub{color:var(--text-muted);font-size:15px;max-width:480px;margin:16px auto 0;line-height:1.6;}
-
-/* shared components */
-
-.gate-icon{
-  width:56px;height:56px;
-  border-radius:50%;
-  background:var(--surface-2);
-  border:1px solid var(--line);
+  padding:56px 32px 28px;
   display:flex;
   align-items:center;
-  justify-content:center;
-  margin:0 auto 20px;
-  font-size:22px;
-}
-
-.gate-card .discord-btn{width:100%;justify-content:center;}
-
-.discord-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  padding:13px 24px;
-  border-radius:10px;
-  background:var(--discord);
-  color:#fff;
-  font-weight:700;
-  font-size:14px;
-  text-decoration:none;
-  transition:transform .2s ease, filter .2s ease;
-}
-
-.discord-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
-.discord-btn svg{width:20px;height:20px;}
-
-.gate-fine{
-  margin-top:18px;
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  color:var(--text-muted);
-}
-
-.gate-fine a{color:var(--accent-2);}
-
-footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center;}
-
-.footer-links{display:flex;justify-content:center;gap:26px;margin:26px 0;flex-wrap:wrap;}
-.footer-links a{text-decoration:none;color:var(--text-muted);font-size:12px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;transition:color .2s ease;}
-.footer-links a:hover{color:var(--accent-2);}
-.footer-logo-img{height:96px;max-width:80%;object-fit:contain;display:block;margin:0 auto;}
-
-.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1.5px;}
-.footer-tag{color:var(--text-muted);font-size:13px;margin-top:8px;}
-.footer-fine{color:var(--text-muted);font-size:11.5px;font-family:'JetBrains Mono',monospace;margin-top:22px;}
-
-@media (max-width:768px){
-  .site-header{padding:14px 14px;}
-  .site-header.scrolled{padding:10px 14px;}
-  nav.main-nav{gap:12px;}
-  nav.main-nav a{font-size:10.5px;letter-spacing:.8px;padding-bottom:3px;}
-  .social-icons{gap:12px;}
-  .social-icons svg{width:16px;height:16px;}
-  .hero{height:300px;min-height:0;}
-  .page-head{padding:34px 18px 0;}
-}
-
-
-.container{max-width:1200px;margin:auto;padding:36px 32px 120px;}
-
-.gate-card{
-  max-width:430px;
-  margin:10px auto 0;
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:20px;
-  padding:42px 36px 34px;
-  text-align:center;
-}
-
-.gate-gem{
-  width:58px;height:58px;
-  margin:0 auto 20px;
-  border-radius:16px;
-  background:rgba(255,61,122,.12);
-  border:1px solid rgba(255,61,122,.3);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:var(--accent);
-}
-
-.gate-gem svg{width:26px;height:26px;}
-
-.gate-eyebrow{
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  letter-spacing:3px;
-  color:var(--accent);
-  margin-bottom:8px;
-}
-
-.gate-divider{
-  height:1px;
-  background:var(--line);
-  margin:24px 0;
-}
-
-.gate-lock{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  margin-top:14px;
-  font-size:11.5px;
-  color:var(--text-muted);
-}
-
-.gate-lock svg{width:12px;height:12px;}
-
-.gate-card h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:30px;
-  letter-spacing:1px;
-  margin:0 0 10px;
-}
-
-.gate-card p{
-  color:var(--text-muted);
-  font-size:14px;
-  line-height:1.7;
-  margin:0 0 26px;
-}
-
-.user-bar{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:14px;
-  margin-bottom:30px;
-  font-size:13px;
-  color:var(--text-muted);
+  justify-content:space-between;
+  gap:24px;
   flex-wrap:wrap;
 }
 
-.user-bar .badge{
-  font-family:'JetBrains Mono',monospace;
-  font-size:11px;
-  padding:4px 10px;
-  border-radius:100px;
-  border:1px solid var(--line);
-  color:var(--accent-2);
+.search-box{
+  position:relative;
+  flex:1;
+  min-width:260px;
+  max-width:420px;
 }
 
-.user-bar a{color:var(--text-muted);font-size:12px;}
+.search-icon{
+  position:absolute;
+  left:16px; top:50%;
+  transform:translateY(-50%);
+  color:var(--text-muted);
+  font-size:15px;
+  pointer-events:none;
+}
+
+.search-box input{
+  width:100%;
+  padding:13px 16px 13px 40px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--text);
+  font-size:14px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.search-box input::placeholder{color:var(--text-muted);}
+.search-box input:focus{outline:2px solid rgba(255,255,255,.35);outline-offset:1px;}
+
+.stats{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:1px;
+  color:var(--text-muted);
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+
+.stats span{color:var(--text);}
+
+/* ---------- GRID ---------- */
 
 .grid{
+  max-width:1200px;
+  margin:auto;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:20px;
+  padding:10px 32px 100px;
 }
-
-.ex-cat-title{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:30px;
-  letter-spacing:1px;
-  margin:34px 0 16px;
-}
-
-.ex-cat-title:first-child{margin-top:0;}
 
 .card{
   position:relative;
@@ -323,22 +217,53 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   transition:transform .3s ease;
 }
 
-.card:hover{transform:translateY(-4px);}
-.card a{display:block;text-decoration:none;position:relative;}
-.card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--card-shadow);
+}
+
+.card a{
+  display:block;
+  text-decoration:none;
+  position:relative;
+}
+
+.card img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
 
 .card-overlay{
   position:absolute;
   left:0; right:0; bottom:0;
   padding:14px 12px 12px;
   background:linear-gradient(0deg, rgba(24,24,27,.95), transparent);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
   opacity:0;
   transform:translateY(6px);
   transition:opacity .25s ease, transform .25s ease;
 }
 
 .card:hover .card-overlay{opacity:1;transform:translateY(0);}
-.card-title{font-size:12.5px;font-weight:600;text-transform:capitalize;color:#f6f4f9;}
+
+.card-title{
+  font-size:12.5px;
+  font-weight:600;
+  line-height:1.3;
+  text-transform:capitalize;
+  color:#f6f4f9;
+}
+
+.card-open{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:1px;
+  color:var(--accent-2);
+}
 
 .empty-state{
   grid-column:1/-1;
@@ -349,12 +274,374 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   font-size:13px;
 }
 
+/* ---------- DETAIL VIEW ---------- */
+
+.detail{
+  max-width:1100px;
+  margin:0 auto;
+  padding:150px 32px 60px;
+}
+
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:13px;
+  letter-spacing:.5px;
+  margin-bottom:34px;
+  transition:color .2s ease;
+}
+
+.back-link:hover{color:var(--text);}
+
+.detail-grid{
+  display:grid;
+  grid-template-columns:420px 1fr;
+  gap:48px;
+  align-items:start;
+}
+
+.detail-media{
+  border-radius:14px;
+  overflow:hidden;
+  background:transparent;
+}
+
+.detail-media img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
+
+.detail-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--accent-2);
+  display:block;
+  margin-bottom:10px;
+}
+
+.detail-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(36px,5vw,54px);
+  letter-spacing:1px;
+  margin:0 0 22px;
+  text-transform:capitalize;
+}
+
+.meta-rows{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-bottom:20px;
+  padding-bottom:20px;
+  border-bottom:1px solid var(--line);
+}
+
+.meta-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+
+.meta-row .meta-label{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  color:var(--text-muted);
+  letter-spacing:1px;
+  min-width:150px;
+}
+
+.meta-row .meta-label svg,.tags-label svg{
+  width:15px;height:15px;
+  display:block;
+  flex-shrink:0;
+  opacity:.8;
+}
+
+.tags-label{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:13px;
+  color:var(--text-muted);
+  letter-spacing:1px;
+  margin-right:4px;
+}
+
+.meta-row .meta-value{font-weight:600;}
+
+.tag-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:26px;
+}
+
+.tag-pill{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:.5px;
+  color:var(--text-muted);
+  background:var(--surface);
+  border:1px solid var(--line);
+  padding:6px 12px;
+  border-radius:100px;
+}
+
+.detail-desc{
+  color:var(--text-muted);
+  font-size:14.5px;
+  line-height:1.75;
+  max-width:480px;
+  margin-bottom:28px;
+}
+
+.download-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:14px;
+  padding:14px 22px;
+  border-radius:12px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  text-decoration:none;
+  color:var(--text);
+  transition:border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.download-btn:hover{
+  border-color:var(--text-muted);
+  background:var(--surface);
+  transform:translateY(-2px);
+}
+
+.download-icon{
+  width:38px;height:38px;
+  border-radius:10px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--accent-2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+
+.download-icon svg{width:18px;height:18px;display:block;}
+
+.download-label{display:block;font-weight:700;font-size:14px;}
+.download-sub{display:block;font-size:11.5px;color:var(--text-muted);margin-top:2px;}
+
+.credit-line{
+  margin-top:16px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;
+  color:var(--text-muted);
+}
+
+.credit-line span{color:var(--accent-2);}
+
+.more-section{
+  margin-top:80px;
+  padding-top:36px;
+  border-top:1px solid var(--line);
+}
+
+.more-heading{
+  font-size:12px;
+  letter-spacing:2.5px;
+  color:var(--text-muted);
+  margin-bottom:22px;
+}
+
+.more-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.more-card:nth-child(4){display:none;}
+
+.more-card{
+  text-decoration:none;
+  color:var(--text);
+  border-radius:10px;
+  overflow:hidden;
+  background:transparent;
+  transition:transform .3s ease;
+}
+
+.more-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow);}
+
+.more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
+
 @media (max-width:768px){
-  .container{padding:26px 18px 90px;}
-  .grid{grid-template-columns:repeat(2,1fr);gap:14px;}
+  .detail{padding:64px 16px 40px;}
+  .detail-grid{grid-template-columns:1fr;gap:14px;}
+  .back-link{margin-bottom:14px;}
+  .detail-media{max-width:none;margin:0;}
+  .detail-title{font-size:30px;margin-bottom:10px;}
+  .detail-eyebrow{margin-bottom:6px;font-size:11px;}
+  .meta-rows{gap:8px;margin-bottom:12px;padding-bottom:12px;}
+  .meta-row{font-size:12.5px;}
+  .meta-row .meta-label{min-width:0;}
+  .tag-row{margin-bottom:16px;}
+  .detail-info{text-align:left;}
+  .download-btn{display:flex;width:100%;justify-content:center;}
+  .credit-line{text-align:left;}
+  .more-grid{grid-template-columns:repeat(2,1fr);}
+  .more-card:nth-child(4){display:block;}
+}
+
+/* ---------- FOOTER ---------- */
+
+footer{
+  border-top:1px solid var(--line);
+  padding:56px 32px 40px;
+  text-align:center;
+}
+
+.footer-logo-img{height:96px;max-width:80%;object-fit:contain;display:block;margin:0 auto;}
+
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;
+  letter-spacing:1.5px;
+}
+
+.footer-tag{
+  color:var(--text-muted);
+  font-size:13px;
+  margin-top:8px;
+}
+
+.footer-links{
+  display:flex;
+  justify-content:center;
+  gap:26px;
+  margin:26px 0;
+  flex-wrap:wrap;
+}
+
+.footer-links a{
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-weight:600;
+  transition:color .2s ease;
+}
+
+.footer-links a:hover{color:var(--accent-2);}
+
+.footer-fine{
+  color:var(--text-muted);
+  font-size:11.5px;
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.3px;
+}
+
+.footer-fine a{color:var(--text-muted);text-decoration:underline;}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width:768px){
+
+  .site-header{padding:14px 14px;}
+  .site-header.scrolled{padding:10px 14px;}
+  nav.main-nav{gap:12px;}
+  nav.main-nav a{font-size:10.5px;letter-spacing:.8px;padding-bottom:3px;}
+  .social-icons{gap:12px;}
+  .social-icons svg{width:16px;height:16px;}
+
+  .hero{height:300px;min-height:0;}
+
+
+  .toolbar{padding:40px 18px 20px;}
+  .grid{padding:6px 18px 70px;gap:14px;grid-template-columns:repeat(2,1fr);}
+
 }
 
 
+
+
+
+/* category cards: overlay always visible */
+.card.cat-card .card-overlay{
+  opacity:1;
+  transform:none;
+  padding:16px 14px 14px;
+}
+
+.cat-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;
+  letter-spacing:1px;
+  color:#f6f4f9;
+  line-height:1;
+}
+
+.cat-count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--accent-2);
+  margin-top:6px;
+  display:block;
+}
+
+/* browse bar (back to categories + current category title) */
+.browse-bar{
+  max-width:1200px;
+  margin:0 auto;
+  padding:0 32px 6px;
+  display:none;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:8px;
+}
+
+.browse-bar.visible{display:flex;}
+
+.browse-back{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:13px;
+  cursor:pointer;
+  background:none;border:none;
+  font-family:'Inter',sans-serif;
+  padding:0;
+  transition:color .2s ease;
+}
+
+.browse-back:hover{color:var(--text);}
+
+.browse-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:34px;
+  letter-spacing:1px;
+  line-height:1;
+}
+
+@media (max-width:768px){
+  .browse-bar{padding:0 18px 4px;}
+  .cat-name{font-size:18px;}
+}
+
+/* ---------- LOGIN BUTTON ---------- */
 
 /* account button + logout menu */
 .social-icons{position:relative;}
@@ -584,9 +871,125 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   .social-icons a[aria-label]{display:none;}
 }
 
+
+/* ---------- BOOSTER GATE ---------- */
+
+:root{--boost:#bd7bff;}
+
+.gate-wrap{max-width:900px;margin:0 auto;padding:56px 24px 80px;}
+
+.gate-card{
+  max-width:430px;
+  margin:0 auto;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:42px 36px 34px;
+  text-align:center;
+}
+
+.gate-gem{
+  width:58px;height:58px;
+  margin:0 auto 20px;
+  border-radius:16px;
+  background:rgba(189,123,255,.13);
+  border:1px solid rgba(189,123,255,.32);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--boost);
+}
+
+.gate-gem svg{width:30px;height:30px;}
+
+.gate-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  letter-spacing:3px;
+  color:var(--boost);
+  margin-bottom:8px;
+}
+
+.gate-card h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:30px;
+  letter-spacing:1px;
+  margin:0 0 10px;
+}
+
+.gate-card p{
+  color:var(--text-muted);
+  font-size:14px;
+  line-height:1.7;
+  margin:0 0 26px;
+}
+
+.gate-divider{height:1px;background:var(--line);margin:24px 0;}
+
+.discord-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  gap:10px;
+  padding:13px 24px;
+  border-radius:10px;
+  background:#5865F2;
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  text-decoration:none;
+  transition:transform .2s ease, filter .2s ease;
+}
+
+.discord-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
+.discord-btn svg{width:20px;height:20px;}
+
+.gate-lock{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin-top:14px;
+  font-size:11.5px;
+  color:var(--text-muted);
+}
+
+.gate-lock svg{width:12px;height:12px;}
+
+.gate-fine{
+  margin-top:18px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-muted);
+}
+
+.gate-fine a{color:var(--boost);}
+
+.user-bar{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:14px;
+  padding:34px 20px 0;
+  font-size:13px;
+  color:var(--text-muted);
+  flex-wrap:wrap;
+}
+
+.user-bar .badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  padding:4px 10px;
+  border-radius:100px;
+  border:1px solid rgba(189,123,255,.4);
+  color:var(--boost);
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
+  --card-shadow:0 14px 30px rgba(30,22,12,.2);
   --bg:#f7f4ef;
   --surface:#ffffff;
   --surface-2:#efe9e0;
@@ -621,7 +1024,7 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
 
 <body>
 
-<header class="site-header">
+<header class="site-header" id="siteHeader">
   <button class="menu-btn" id="menuBtn" aria-label="Open menu"><span></span><span></span><span></span></button>
   <nav class="main-nav">
     <a href="../">Home</a>
@@ -659,18 +1062,11 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   <div class="hero-bg"></div>
 </section>
 
-<div class="page-head">
-  <h1 class="page-title">Exclusive</h1>
-</div>
-
-<div class="container">
-
-  <div class="gate-card" id="gateCard" style="display:none">
-    <div class="gate-gem">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9l4-6Z"/><path d="M2 9h20M9.5 3 8 9l4 12 4-12-1.5-6"/></svg>
-    </div>
+<div class="gate-wrap" id="gateWrap">
+  <div class="gate-card" id="gateCard">
+    <div class="gate-gem"><svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd"><path d="M12 1.6 18.4 6.4 V17.6 L12 22.4 5.6 17.6 V6.4 Z M12 6.2 15.4 8.8 V15.2 L12 17.8 8.6 15.2 V8.8 Z"/><path d="m20.6 3.4.55 1.35 1.35.55-1.35.55-.55 1.35-.55-1.35-1.35-.55 1.35-.55Z"/><path d="m3.4 16.4.55 1.35 1.35.55-1.35.55-.55 1.35-.55-1.35-1.35-.55 1.35-.55Z"/></svg></div>
     <div class="gate-eyebrow">BOOSTERS ONLY</div>
-    <h2 id="gateTitle">Exclusive Scenepacks</h2>
+    <h2 id="gateTitle">Exclusive Hub</h2>
     <p id="gateText">Sign in with Discord to verify your booster status and unlock exclusive scenepacks.</p>
     <div class="gate-divider"></div>
     <a class="discord-btn" href="/auth/login?redirect=/exclusive/">
@@ -680,17 +1076,62 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
     <p class="gate-lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Only active server boosters can enter.</p>
     <p class="gate-fine">Not in the server yet? <a href="https://discord.gg/HdQSnmwqVz" target="_blank" rel="noopener">Join here</a> first.</p>
   </div>
+</div>
 
-  <div id="unlockedView" style="display:none">
-    <div class="user-bar">
-      <span>Logged in as <strong id="userName"></strong></span>
-      <span class="badge">ACCESS GRANTED</span>
-      <a href="/auth/logout">Log out</a>
-    </div>
-    <div id="exclusiveContent"></div>
+<div id="unlockedView" style="display:none">
+
+<div class="user-bar">
+  <span>Logged in as <strong id="userName" style="color:var(--text)"></strong></span>
+  <span class="badge">BOOSTER ACCESS</span>
+</div>
+
+<div id="browseView">
+
+<section class="toolbar">
+  <div class="search-box">
+    <span class="search-icon">⌕</span>
+    <input id="search" placeholder="search scenepacks...">
   </div>
+  <div class="stats" id="statsLine"></div>
+</section>
+
+<div class="browse-bar" id="browseBar">
+  <button class="browse-back" id="browseBack">&#8592; All categories</button>
+  <span class="browse-title" id="browseTitle"></span>
+</div>
+
+<section class="grid" id="grid"></section>
 
 </div>
+
+<section class="detail" id="detailView" style="display:none">
+  <a href="./" class="back-link">&#8592; Back to all scenepacks</a>
+  <div class="detail-grid">
+    <div class="detail-media">
+      <img id="detailImg" alt="">
+    </div>
+    <div class="detail-info">
+      <span class="detail-eyebrow">Scenepack</span>
+      <h1 class="detail-title" id="detailTitle"></h1>
+      <div class="meta-rows" id="detailMeta"></div>
+      <div class="tag-row" id="detailTags"></div>
+      <a class="download-btn" id="detailDownload" target="_blank" rel="noopener">
+        <span class="download-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+        <span>
+          <span class="download-label">Download on MEGA</span>
+          <span class="download-sub">Opens in a new tab</span>
+        </span>
+      </a>
+      <p class="credit-line">Credit required: <span>@sceneagb</span></p>
+    </div>
+  </div>
+  <div class="more-section">
+    <div class="more-heading mono">MORE SCENEPACKS</div>
+    <div class="more-grid" id="moreGrid"></div>
+  </div>
+</section>
+
+</div><!-- /unlockedView -->
 
 <footer>
   <img class="footer-logo-img" id="footerLogo" src="../images/logo.png" alt="sceneagb"
@@ -706,28 +1147,23 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
 </footer>
 
 <script>
-(function(){
-  const header=document.querySelector(".site-header")
-  function onScroll(){header.classList.toggle("scrolled",window.scrollY>40)}
-  window.addEventListener("scroll",onScroll)
-  onScroll()
-})()
-</script>
 
+const grid=document.getElementById("grid")
+const searchInput=document.getElementById("search")
+const statsLine=document.getElementById("statsLine")
+const header=document.getElementById("siteHeader")
+const browseView=document.getElementById("browseView")
+const detailView=document.getElementById("detailView")
+const browseBar=document.getElementById("browseBar")
+const browseTitle=document.getElementById("browseTitle")
 
-<script>
-
-const gateCard=document.getElementById("gateCard")
-const gateTitle=document.getElementById("gateTitle")
-const gateText=document.getElementById("gateText")
-const unlockedView=document.getElementById("unlockedView")
-
-function imgSrc(path){
-  if(!path) return ""
-  if(path.startsWith("http")) return path
-  if(path.startsWith("r2/")) return "/"+path
-  return "../"+path
-}
+let packs=[]
+let categories=[]
+let currentCat=null      // null = category grid; string = packs of that category
+let activeList=[]        // [{pack, idx}] of packs being shown
+let renderedCount=0
+let forceDarkHeader=false
+const packsPerLoad=12
 
 function formatTitle(imgPath){
   let name=imgPath.split("/").pop().replace(/\.(png|jpe?g|gif)$/i,"")
@@ -736,86 +1172,421 @@ function formatTitle(imgPath){
   return name
 }
 
-async function init(){
+function imgSrc(path){
+  if(!path) return ""
+  if(path.startsWith("http")) return path
+  if(path.startsWith("r2/")) return "/"+path
+  return "../"+path
+}
+
+function packTitle(pack){
+  return (pack.title&&pack.title.trim())?pack.title.trim():formatTitle(pack.img)
+}
+
+function linkType(link){
+  return link.includes("/folder/") ? "Folder" : "File"
+}
+
+const KEYWORD_TAGS=[
+  ["interview","Interviews"],
+  ["podcast","Podcasts"],
+  ["tour","Eras"],
+  ["era","Eras"],
+  ["press","Press"],
+  ["photoshoot","Photoshoots"],
+  ["performance","Performances"],
+  ["vmas","Performances"],
+  ["fallon","Performances"],
+  ["snl","Performances"],
+  ["seth meyers","Performances"],
+  ["quotidien","Interviews"],
+  ["globes","Awards Shows"],
+  ["awards","Awards Shows"],
+  ["music video","Music Videos"],
+  ["movie","Films"]
+]
+
+function guessCategory(title){
+  const lower=title.toLowerCase()
+  for(const [kw,tag] of KEYWORD_TAGS){
+    if(lower.includes(kw)) return tag
+  }
+  return "Other"
+}
+
+function packCategory(pack){
+  const set=(pack.category&&pack.category.trim())?pack.category.trim():""
+  const adminCats=normCats().map(c=>c.name)
+  if(adminCats.length>0){
+    // admin-defined categories are authoritative: no auto-guessing
+    return adminCats.includes(set)?set:"Other"
+  }
+  return set||guessCategory(packTitle(pack))
+}
+
+function normCats(){
+  // categories may be strings (old data) or {name, img}
+  return categories.map(c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}).filter(c=>c.name)
+}
+
+function categoryData(){
+  const order=normCats()
+  const map=new Map()
+  packs.forEach((p,i)=>{
+    const c=packCategory(p)
+    if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img})
+    map.get(c).count++
+  })
+  const out=[]
+  order.forEach(c=>{
+    if(map.has(c.name)){
+      const entry=map.get(c.name)
+      if(c.img) entry.cover=c.img   // category's own thumbnail wins
+      out.push(entry)
+      map.delete(c.name)
+    }
+  })
+  ;[...map.keys()].sort().forEach(c=>out.push(map.get(c)))
+  return out
+}
+
+function updateStats(mode,count,label){
+  if(mode==="category"){
+    statsLine.innerHTML=`<span>${count}</span> scenepack${count===1?"":"s"} in ${label}`
+  }else if(mode==="search"){
+    statsLine.innerHTML=`<span>${count}</span> result${count===1?"":"s"}`
+  }else{
+    const catCount=categoryData().length
+    statsLine.innerHTML=`<span>${catCount}</span> categories &middot; <span>${packs.length}</span> scenepacks`
+  }
+}
+
+/* ---------- rendering ---------- */
+
+function createPackCard(pack,idx){
+  const card=document.createElement("div")
+  card.className="card"
+  const title=packTitle(pack)
+  card.innerHTML=`
+    <a href="?pack=${idx}">
+      <img src="${imgSrc(pack.img)}" loading="lazy" alt="${title}">
+      <div class="card-overlay">
+        <span class="card-title">${title}</span>
+        <span class="card-open">VIEW&nbsp;&#9656;</span>
+      </div>
+    </a>
+  `
+  grid.appendChild(card)
+}
+
+function createCategoryCard(cat){
+  const card=document.createElement("div")
+  card.className="card cat-card"
+  card.innerHTML=`
+    <a href="?cat=${encodeURIComponent(cat.name)}">
+      <img src="${imgSrc(cat.cover)}" loading="lazy" alt="${cat.name}">
+      <div class="card-overlay">
+        <span class="cat-name">${cat.name}</span>
+        <span class="cat-count">${cat.count} scenepack${cat.count===1?"":"s"}</span>
+      </div>
+    </a>
+  `
+  grid.appendChild(card)
+}
+
+function showCategories(){
+  currentCat=null
+  updateStats()
+  browseBar.classList.remove("visible")
+  grid.innerHTML=""
+  renderedCount=0
+  activeList=[]
+  const cats=categoryData()
+  if(cats.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks yet</div>`
+    return
+  }
+  cats.forEach(createCategoryCard)
+}
+
+function showCategoryPacks(cat){
+  currentCat=cat
+  browseBar.classList.add("visible")
+  browseTitle.textContent=cat
+  activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat)
+  updateStats("category",activeList.length,cat)
+  grid.innerHTML=""
+  renderedCount=0
+  if(activeList.length===0){
+    grid.innerHTML=`<div class="empty-state">nothing in this category yet</div>`
+    return
+  }
+  loadMore()
+}
+
+function showSearchResults(q){
+  browseBar.classList.add("visible")
+  browseTitle.textContent='results for "'+q+'"'
+  const ql=q.toLowerCase()
+  activeList=packs.map((p,i)=>({pack:p,idx:i}))
+    .filter(({pack})=>{
+      const hay=(packTitle(pack)+" "+(pack.tags||[]).join(" ")+" "+(pack.category||"")).toLowerCase()
+      return hay.includes(ql)
+    })
+  updateStats("search",activeList.length)
+  grid.innerHTML=""
+  renderedCount=0
+  if(activeList.length===0){
+    grid.innerHTML=`<div class="empty-state">no scenepacks match "${q}"</div>`
+    return
+  }
+  loadMore()
+}
+
+function loadMore(){
+  for(let i=0;i<packsPerLoad;i++){
+    if(renderedCount>=activeList.length) return
+    const {pack,idx}=activeList[renderedCount]
+    createPackCard(pack,idx)
+    renderedCount++
+  }
+}
+
+document.getElementById("browseBack").addEventListener("click",()=>{
+  searchInput.value=""
+  history.replaceState(null,"",window.location.pathname)
+  showCategories()
+})
+
+/* ---------- detail ---------- */
+
+function renderDetail(id){
+  const pack=packs[id]
+  if(!pack){
+    detailView.innerHTML=`<a href="./" class="back-link">&#8592; Back to all scenepacks</a><p style="color:var(--text-muted)">That scenepack couldn't be found.</p>`
+    return
+  }
+
+  const title=packTitle(pack)
+  const category=packCategory(pack)
+  const type=linkType(pack.link)
+  const tags=(pack.tags&&pack.tags.length)?pack.tags:[category]
+  const resolution=pack.res||"4K"
+  const size=pack.size||"—"
+
+  const ICON_RES=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 21h8"/></svg>`
+  const ICON_SIZE=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6"/><path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/></svg>`
+  const ICON_TAG=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 12 22 2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z"/><circle cx="7.5" cy="7.5" r="1"/></svg>`
+
+  document.title=title+" — sceneagb"
+  document.getElementById("detailImg").src=imgSrc(pack.img)
+  document.getElementById("detailImg").alt=title
+  document.getElementById("detailTitle").textContent=title
+  document.querySelector(".detail-eyebrow").textContent=category
+
+  // back link returns to this pack's category
+  document.querySelector("#detailView .back-link").href="?cat="+encodeURIComponent(category)
+  document.querySelector("#detailView .back-link").innerHTML="&#8592; Back to "+category
+
+  document.getElementById("detailMeta").innerHTML=`
+    <div class="meta-row"><span class="meta-label mono">${ICON_RES} RESOLUTION</span><span class="meta-value">${resolution}</span></div>
+    <div class="meta-row"><span class="meta-label mono">${ICON_SIZE} STORAGE SIZE</span><span class="meta-value">${size}</span></div>
+  `
+  document.getElementById("detailTags").innerHTML=`
+    <span class="tags-label">${ICON_TAG}</span>
+    ${tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}
+  `
+  document.getElementById("detailDownload").href=pack.link
+
+  const moreGrid=document.getElementById("moreGrid")
+  moreGrid.innerHTML=""
+  document.querySelector(".more-heading").textContent="MORE FROM "+category.toUpperCase()
+
+  const sameCat=packs.map((p,i)=>i).filter(i=>i!==id&&packCategory(packs[i])===category)
+  const picks=sameCat.slice(0,4)
+  document.querySelector(".more-section").style.display=picks.length?"":"none"
+
+  picks.forEach(i=>{
+    const p=packs[i]
+    const a=document.createElement("a")
+    a.className="more-card"
+    a.href=`?pack=${i}`
+    a.innerHTML=`<img src="${imgSrc(p.img)}" loading="lazy" alt="${packTitle(p)}">`
+    moreGrid.appendChild(a)
+  })
+}
+
+/* ---------- boot ---------- */
+
+function showGate(mode,name){
+  document.getElementById("unlockedView").style.display="none"
+  document.getElementById("gateWrap").style.display="block"
+  const t=document.getElementById("gateText")
+  if(mode==="backend"){
+    t.textContent="This page needs the site to be hosted on Cloudflare Pages with Discord login configured."
+  }else if(mode==="role"){
+    t.textContent="You're logged in as "+name+", but only active server boosters can enter. Boost the sceneagb Discord, then log out and back in to verify."
+  }
+}
+
+async function loadData(){
   let me
   try{
-    const res=await fetch("/api/me")
-    me=await res.json()
+    const r=await fetch("/api/me")
+    if(!r.ok) throw new Error()
+    me=await r.json()
   }catch(e){
-    gateCard.style.display="block"
-    gateText.textContent="This page needs the site to be hosted on Cloudflare Pages with Discord login configured. See the setup guide."
+    showGate("backend")
     return
   }
 
   if(!me.loggedIn){
-    gateCard.style.display="block"
+    showGate("login")
     return
   }
 
   if(!me.hasExclusive){
-    gateCard.style.display="block"
-    gateText.textContent="You're logged in as "+me.username+", but only active server boosters can enter. Boost the sceneagb Discord, then log out and back in to verify."
+    showGate("role",me.username)
     return
   }
 
+  // unlocked
+  document.getElementById("gateWrap").style.display="none"
+  document.getElementById("unlockedView").style.display="block"
   document.getElementById("userName").textContent=me.username
-  unlockedView.style.display="block"
 
-  const res=await fetch("/api/exclusive-packs")
-  const exData=await res.json()
-  const packs=Array.isArray(exData)?exData:(exData.packs||[])
-  const cats=(Array.isArray(exData)?[]:(exData.categories||[]))
-    .map(c=>typeof c==="string"?{name:c}:{name:c.name||""}).filter(c=>c.name)
-  const content=document.getElementById("exclusiveContent")
+  try{
+    const res=await fetch("/api/exclusive-packs")
+    const ex=await res.json()
+    packs=Array.isArray(ex)?ex:(ex.packs||[])
+    categories=Array.isArray(ex)?[]:(ex.categories||[])
+  }catch(e){
+    packs=[];categories=[]
+  }
 
-  if(packs.length===0){
-    content.innerHTML=`<div class="empty-state" style="text-align:center;padding:60px 20px;color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:13px">no exclusive packs added yet — check back soon</div>`
+  updateStats()
+
+  const params=new URLSearchParams(window.location.search)
+  const packId=params.get("pack")
+  const cat=params.get("cat")
+
+  if(packId!==null){
+    browseView.style.display="none"
+    detailView.style.display="block"
+    forceDarkHeader=true
+    header.classList.add("scrolled")
+    renderDetail(parseInt(packId,10))
     return
   }
 
-  function packTitle(p){return (p.title&&p.title.trim())?p.title.trim():formatTitle(p.img)}
-
-  function makeCard(pack){
-    const title=packTitle(pack)
-    const card=document.createElement("div")
-    card.className="card"
-    card.innerHTML=`
-      <a href="${pack.link}" target="_blank" rel="noopener">
-        <img src="${imgSrc(pack.img)}" loading="lazy" alt="${title}">
-        <div class="card-overlay"><span class="card-title">${title}</span></div>
-      </a>
-    `
-    return card
-  }
-
-  function addSection(name,list){
-    if(list.length===0) return
-    if(name){
-      const t=document.createElement("div")
-      t.className="ex-cat-title"
-      t.textContent=name
-      content.appendChild(t)
-    }
-    const grid=document.createElement("div")
-    grid.className="grid"
-    list.forEach(p=>grid.appendChild(makeCard(p)))
-    content.appendChild(grid)
-  }
-
-  if(cats.length===0){
-    addSection("",packs)
+  if(cat){
+    showCategoryPacks(cat)
   }else{
-    const used=new Set()
-    cats.forEach(c=>{
-      const list=packs.filter(p=>(p.category||"")===c.name)
-      list.forEach(p=>used.add(p))
-      addSection(c.name,list)
-    })
-    addSection("More",packs.filter(p=>!used.has(p)))
+    showCategories()
+  }
+  startSearchTypewriter()
+}
+
+function startSearchTypewriter(){
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+    searchInput.placeholder="search scenepacks..."
+    return
+  }
+  const words=packs.slice(0,20).map(p=>`search "${packTitle(p)}"...`)
+  if(words.length===0) return
+  let wordIndex=0, charIndex=0, deleting=false
+
+  function tick(){
+    const current=words[wordIndex]
+    if(!deleting){
+      charIndex++
+      searchInput.placeholder=current.slice(0,charIndex)
+      if(charIndex===current.length){
+        deleting=true
+        setTimeout(tick,1300)
+        return
+      }
+    }else{
+      charIndex--
+      searchInput.placeholder=current.slice(0,charIndex)
+      if(charIndex===0){
+        deleting=false
+        wordIndex=(wordIndex+1)%words.length
+      }
+    }
+    setTimeout(tick,deleting?30:65)
+  }
+  tick()
+}
+
+window.addEventListener("scroll",()=>{
+  if(window.innerHeight+window.scrollY>=document.body.offsetHeight-200){
+    loadMore()
+  }
+  if(!forceDarkHeader){
+    header.classList.toggle("scrolled",window.scrollY>40)
+  }
+})
+
+searchInput.addEventListener("input",()=>{
+  const q=searchInput.value.trim()
+  if(q){
+    showSearchResults(q)
+  }else if(currentCat){
+    showCategoryPacks(currentCat)
+  }else{
+    showCategories()
+  }
+})
+
+// ---- account: login button + hidden nav links ----
+async function initAccount(){
+  const btn=document.getElementById("loginBtn")
+  try{
+    const res=await fetch("/api/me")
+    if(!res.ok) throw new Error()
+    const me=await res.json()
+    btn.style.display="inline-flex"
+    const nav=document.querySelector("nav.main-nav")
+    const aboutLink=nav.querySelector('a[href*="about"]')
+    if(me.loggedIn){
+      btn.textContent=me.username
+      btn.removeAttribute("href")
+      btn.title=""
+      let menu=document.getElementById("accountMenu")
+      if(!menu){
+        menu=document.createElement("div")
+        menu.className="account-menu"
+        menu.id="accountMenu"
+        menu.innerHTML='<div class="who">Signed in as<strong>'+me.username+'</strong></div><a href="/auth/logout">Log out</a>'
+        btn.closest(".social-icons").appendChild(menu)
+      }
+      btn.addEventListener("click",e=>{
+        e.preventDefault()
+        menu.classList.toggle("open")
+      })
+      document.addEventListener("click",e=>{
+        if(!e.target.closest(".login-btn")&&!e.target.closest(".account-menu")){
+          menu.classList.remove("open")
+        }
+      })
+      if(!nav.querySelector('a[href*="request"]')){
+        aboutLink.insertAdjacentHTML("beforebegin",'<a href="../request/">Request</a>')
+      }
+      if(me.isAdmin){
+        nav.insertAdjacentHTML("beforeend",'<a href="../admin/">Admin</a>')
+      }
+    }else{
+      btn.textContent="Log in"
+      btn.href="/auth/login?redirect=/exclusive/"
+    }
+  }catch(e){
+    // static hosting — no backend
   }
 }
 
-init()
+initAccount()
+loadData()
 
 </script>
 
@@ -847,52 +1618,6 @@ init()
     try{localStorage.setItem("sceneagb-theme",next)}catch(e){}
     apply(next)
   })
-})()
-</script>
-
-<script>
-(async function(){
-  const btn=document.getElementById("loginBtn")
-  if(!btn) return
-  try{
-    const res=await fetch("/api/me")
-    if(!res.ok) throw new Error()
-    const me=await res.json()
-    btn.style.display="inline-flex"
-    if(me.loggedIn){
-      btn.textContent=me.username
-      btn.removeAttribute("href")
-      btn.title=""
-      let menu=document.getElementById("accountMenu")
-      if(!menu){
-        menu=document.createElement("div")
-        menu.className="account-menu"
-        menu.id="accountMenu"
-        menu.innerHTML='<div class="who">Signed in as<strong>'+me.username+'</strong></div><a href="/auth/logout">Log out</a>'
-        btn.closest(".social-icons").appendChild(menu)
-      }
-      btn.addEventListener("click",e=>{
-        e.preventDefault()
-        menu.classList.toggle("open")
-      })
-      document.addEventListener("click",e=>{
-        if(!e.target.closest(".login-btn")&&!e.target.closest(".account-menu")){
-          menu.classList.remove("open")
-        }
-      })
-      const nav=document.querySelector("nav.main-nav")
-      const aboutLink=nav.querySelector('a[href*="about"]')||nav.lastElementChild
-      if(!nav.querySelector('a[href*="request"]')){
-        aboutLink.insertAdjacentHTML("beforebegin",'<a href="../request/">Request</a>')
-      }
-      if(me.isAdmin){
-        document.querySelector("nav.main-nav").insertAdjacentHTML("beforeend",'<a href="../admin/">Admin</a>')
-      }
-    }else{
-      btn.textContent="Log in"
-      btn.href="/auth/login?redirect=/exclusive/"
-    }
-  }catch(e){}
 })()
 </script>
 
