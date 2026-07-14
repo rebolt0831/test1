@@ -610,13 +610,13 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
         exclusiveCategories:data.exclusive.categories
       })
     })
-    const data=await res.json()
-    if(res.ok&&data.ok){
+    const result=await res.json()
+    if(res.ok&&result.ok){
       saveStatus.classList.add("ok")
-      saveStatus.textContent=`Saved ${data.saved} packs — live now.`
+      saveStatus.textContent=`Saved ${result.saved} packs — live now.`
     }else{
       saveStatus.classList.add("err")
-      saveStatus.textContent=data.error||"Save failed."
+      saveStatus.textContent=result.error||"Save failed."
     }
   }catch(e){
     saveStatus.classList.add("err")
