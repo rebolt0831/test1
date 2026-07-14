@@ -1265,8 +1265,8 @@ function renderDetail(id){
   document.querySelector(".more-heading").textContent="MORE FROM "+category.toUpperCase()
 
   const sameCat=packs.map((p,i)=>i).filter(i=>i!==id&&packCategory(packs[i])===category)
-  const others=packs.map((p,i)=>i).filter(i=>i!==id&&!sameCat.includes(i))
-  const picks=[...sameCat,...others].slice(0,4)
+  const picks=sameCat.slice(0,4)
+  document.querySelector(".more-section").style.display=picks.length?"":"none"
 
   picks.forEach(i=>{
     const p=packs[i]
