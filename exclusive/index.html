@@ -481,7 +481,9 @@ nav.main-nav a.active::after{
   transition:transform .3s ease;
 }
 
+.more-card{position:relative;}
 .more-card:hover{transform:translateY(-4px);box-shadow:var(--card-shadow);}
+.more-card:hover .card-overlay{opacity:1;transform:translateY(0);}
 
 .more-card img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;}
 
@@ -1411,7 +1413,12 @@ function renderDetail(id){
     const a=document.createElement("a")
     a.className="more-card"
     a.href=`?pack=${i}`
-    a.innerHTML=`<img src="${imgSrc(p.img)}" loading="lazy" alt="${packTitle(p)}">`
+    a.innerHTML=`
+      <img src="${imgSrc(p.img)}" loading="lazy" alt="${packTitle(p)}">
+      <div class="card-overlay">
+        <span class="card-title">${packTitle(p)}</span>
+        <span class="card-open">VIEW&nbsp;&#9656;</span>
+      </div>`
     moreGrid.appendChild(a)
   })
 }
@@ -1472,6 +1479,8 @@ async function loadData(){
 
   if(packId!==null){
     browseView.style.display="none"
+    document.querySelector(".hero").style.display="none"
+    document.querySelector(".user-bar").style.display="none"
     detailView.style.display="block"
     forceDarkHeader=true
     header.classList.add("scrolled")
