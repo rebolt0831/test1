@@ -95,6 +95,43 @@ a{color:inherit;}
 
 .order-btns{display:flex;gap:6px;margin-right:auto;}
 
+.back-btn{
+  background:none;border:none;cursor:pointer;
+  color:var(--text-muted);
+  font-size:13px;
+  font-family:'Inter',sans-serif;
+  padding:0;
+  margin-top:6px;
+  transition:color .2s ease;
+}
+
+.back-btn:hover{color:var(--text);}
+
+.manage-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 16px;
+  border-radius:9px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--text);
+  font-size:12.5px;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .2s ease;
+  margin-right:10px;
+}
+
+.manage-btn:hover{background:var(--surface);}
+
+.manage-btn .count{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  color:var(--text-muted);
+  font-weight:400;
+}
+
 .order-btn{
   width:34px;height:34px;
   display:flex;align-items:center;justify-content:center;
@@ -335,19 +372,26 @@ input::placeholder{color:var(--text-muted);}
     <button class="tab" id="tabExclusive">Exclusive</button>
   </div>
 
-  <div class="section-title">Categories <button class="danger-link" id="delAllCats">delete all</button></div>
-  <div class="cat-list" id="catList"></div>
-  <div class="add-cat">
-    <input id="newCat" placeholder="new category name e.g. Music Videos" style="min-width:240px">
-    <button class="btn btn-ghost" id="addCatBtn">Add category</button>
+  <div id="catView">
+    <div class="section-title">Categories <button class="danger-link" id="delAllCats">delete all</button></div>
+    <div class="cat-list" id="catList"></div>
+    <div class="add-cat">
+      <input id="newCat" placeholder="new category name e.g. Music Videos" style="min-width:240px">
+      <button class="btn btn-ghost" id="addCatBtn">Add category</button>
+    </div>
+    <div class="hint">
+      <strong>How it works:</strong> use &#9650;&#9660; to set the order visitors see. Click <strong>Manage</strong> on a category to open it and add / edit / reorder its scenepacks. New scenepacks automatically bring their category to the top of the site for 7 days with a NEW badge. Nothing goes live until you hit <strong>Save all changes</strong>.
+    </div>
   </div>
 
-  <div class="section-title">Scenepacks</div>
-  <button class="btn btn-ghost" id="addPackBtn" style="margin-bottom:14px">+ Add new scenepack</button>
-  <div class="pack-list" id="packList"></div>
-
-  <div class="hint">
-    <strong>Tabs:</strong> "Main site" edits the public archive; "Exclusive" edits the booster-only page — each has its own packs and categories, and one Save stores both.<br><br><strong>Thumbnails — three ways:</strong> hit <code>Upload…</code> to upload straight from your device (needs R2 set up, see SETUP.md), or put the file in the repo's <code>images/</code> folder and type the path like <code>images/my pack0.png</code>, or paste any full https image URL. Changes only go live after you hit <strong>Save all changes</strong>.
+  <div id="packView" style="display:none">
+    <button class="back-btn" id="backToCats">&#8592; All categories</button>
+    <div class="section-title" id="packViewTitle"></div>
+    <button class="btn btn-ghost" id="addPackBtn" style="margin-bottom:14px">+ Add scenepack to this category</button>
+    <div class="pack-list" id="packList"></div>
+    <div class="hint">
+      <strong>Thumbnails — three ways:</strong> hit <code>Upload…</code> to upload straight from your device (needs R2, see SETUP.md), put the file in the repo's <code>images/</code> folder and type the path, or paste any https image URL. Changing a pack's <strong>Category</strong> dropdown moves it to that category. Remember to <strong>Save all changes</strong>.
+    </div>
   </div>
 
 </div>
@@ -371,23 +415,20 @@ const topbarRight=document.getElementById("topbarRight")
 const catList=document.getElementById("catList")
 const packList=document.getElementById("packList")
 const saveStatus=document.getElementById("saveStatus")
+const catView=document.getElementById("catView")
+const packView=document.getElementById("packView")
+const packViewTitle=document.getElementById("packViewTitle")
+
+const UNCAT="__uncat__"
 
 let data={
   main:{packs:[],categories:[]},
   exclusive:{packs:[],categories:[]}
 }
 let activeTab="main"
-let categories=data.main.categories
+let currentCat=null   // null = categories view; name or UNCAT = pack view
 let packs=data.main.packs
-
-function switchTab(tab){
-  activeTab=tab
-  packs=data[tab].packs
-  categories=data[tab].categories
-  document.getElementById("tabMain").classList.toggle("active",tab==="main")
-  document.getElementById("tabExclusive").classList.toggle("active",tab==="exclusive")
-  renderCats();renderPacks()
-}
+let categories=data.main.categories
 
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;")}
 
@@ -397,6 +438,49 @@ function imgSrc(path){
   if(path.startsWith("r2/")) return "/"+path
   return "../"+path
 }
+
+function switchTab(tab){
+  activeTab=tab
+  packs=data[tab].packs
+  categories=data[tab].categories
+  currentCat=null
+  document.getElementById("tabMain").classList.toggle("active",tab==="main")
+  document.getElementById("tabExclusive").classList.toggle("active",tab==="exclusive")
+  showCatView()
+}
+
+function showCatView(){
+  currentCat=null
+  packView.style.display="none"
+  catView.style.display="block"
+  renderCats()
+}
+
+function openCategory(name){
+  currentCat=name
+  catView.style.display="none"
+  packView.style.display="block"
+  packViewTitle.textContent=(name===UNCAT?"Uncategorised":name)+" — scenepacks"
+  renderPacks()
+}
+
+function inCat(p,name){
+  if(name===UNCAT){
+    const names=categories.map(c=>c.name)
+    return !p.category||!names.includes(p.category)
+  }
+  return p.category===name
+}
+
+function catIndices(){
+  return packs.map((p,i)=>i).filter(i=>inCat(packs[i],currentCat))
+}
+
+function packCount(name){
+  return packs.filter(p=>inCat(p,name)).length
+}
+
+/* ---------- categories view ---------- */
 
 function renderCats(){
   catList.innerHTML=""
@@ -421,12 +505,30 @@ function renderCats(){
             <button class="order-btn" data-cup="${i}" title="Move up" ${i===0?"disabled":""}>&#9650;</button>
             <button class="order-btn" data-cdown="${i}" title="Move down" ${i===categories.length-1?"disabled":""}>&#9660;</button>
           </div>
-          <button class="btn btn-danger" data-cdel="${i}">Delete category</button>
+          <button class="manage-btn" data-open="${esc(c.name)}">Manage <span class="count">${packCount(c.name)} packs</span> &#9656;</button>
+          <button class="btn btn-danger" data-cdel="${i}">Delete</button>
         </div>
       </div>
     `
     catList.appendChild(row)
   })
+
+  // uncategorised bucket
+  const stray=packCount(UNCAT)
+  if(stray>0){
+    const row=document.createElement("div")
+    row.className="cat-card"
+    row.innerHTML=`
+      <div class="cat-thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:20px">?</div>
+      <div class="cat-fields">
+        <div class="full" style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:14px;font-weight:600">Uncategorised <span style="color:var(--text-muted);font-weight:400;font-size:12px">(shows under "Other" on the site)</span></span>
+          <button class="manage-btn" data-open="${UNCAT}">Manage <span class="count">${stray} packs</span> &#9656;</button>
+        </div>
+      </div>
+    `
+    catList.appendChild(row)
+  }
 
   catList.querySelectorAll("input").forEach(el=>{
     el.addEventListener("input",()=>{
@@ -434,74 +536,54 @@ function renderCats(){
       if(f==="name"){
         const oldName=categories[i].name
         categories[i].name=el.value
-        // keep packs pointing at the renamed category
         packs.forEach(p=>{if(p.category===oldName)p.category=el.value})
+        // refresh the manage button label lazily on next render
       }else{
         categories[i][f]=el.value
         const img=el.closest(".cat-card").querySelector(".cat-thumb")
-        img.style.opacity=1
-        img.src=imgSrc(el.value)
+        if(img.tagName==="IMG"){img.style.opacity=1;img.src=imgSrc(el.value)}
       }
     })
   })
 
   catList.querySelectorAll("[data-cupload]").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const i=+btn.dataset.cupload
-      const picker=document.createElement("input")
-      picker.type="file"
-      picker.accept="image/png,image/jpeg,image/gif,image/webp"
-      picker.addEventListener("change",async()=>{
-        const file=picker.files[0]
-        if(!file) return
-        btn.disabled=true
-        btn.textContent="Uploading…"
-        try{
-          const fd=new FormData()
-          fd.append("file",file)
-          const res=await fetch("/api/admin/upload",{method:"POST",body:fd})
-          const data=await res.json()
-          if(res.ok&&data.ok){
-            categories[i].img=data.path
-            renderCats()
-          }else{
-            alert(data.error||"Upload failed.")
-          }
-        }catch(e){
-          alert("Upload failed — connection error.")
-        }
-        btn.disabled=false
-        btn.textContent="Upload…"
-      })
-      picker.click()
-    })
+    btn.addEventListener("click",()=>uploadImage(file=>{
+      categories[+btn.dataset.cupload].img=file
+      renderCats()
+    },btn))
   })
 
   catList.querySelectorAll("[data-cup]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const i=+btn.dataset.cup
-      if(i>0){[categories[i-1],categories[i]]=[categories[i],categories[i-1]];renderCats();renderPacks()}
+      if(i>0){[categories[i-1],categories[i]]=[categories[i],categories[i-1]];renderCats()}
     })
   })
   catList.querySelectorAll("[data-cdown]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       const i=+btn.dataset.cdown
-      if(i<categories.length-1){[categories[i+1],categories[i]]=[categories[i],categories[i+1]];renderCats();renderPacks()}
+      if(i<categories.length-1){[categories[i+1],categories[i]]=[categories[i],categories[i+1]];renderCats()}
     })
+  })
+
+  catList.querySelectorAll("[data-open]").forEach(btn=>{
+    btn.addEventListener("click",()=>openCategory(btn.dataset.open))
   })
 
   catList.querySelectorAll("[data-cdel]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      if(confirm("Delete this category? Packs keep working, they just show under an auto-guessed category. (Not final until Save)")){
+      if(confirm("Delete this category? Its packs stay but move to Uncategorised. (Not final until Save)")){
         categories.splice(+btn.dataset.cdel,1)
-        renderCats();renderPacks()
+        renderCats()
       }
     })
   })
 }
 
+/* ---------- packs view (inside one category) ---------- */
+
 function catOptions(selected){
-  let out='<option value="">— none —</option>'
+  let out=`<option value="" ${!selected?"selected":""}>— none —</option>`
   categories.forEach(c=>{
     out+=`<option value="${esc(c.name)}" ${c.name===selected?"selected":""}>${esc(c.name)}</option>`
   })
@@ -510,32 +592,39 @@ function catOptions(selected){
 
 function renderPacks(){
   packList.innerHTML=""
-  packs.forEach((p,i)=>{
+  const idxs=catIndices()
+
+  if(idxs.length===0){
+    packList.innerHTML='<span style="font-size:13px;color:var(--text-muted)">no scenepacks in this category yet — add one above</span>'
+  }
+
+  idxs.forEach((mi,pos)=>{
+    const p=packs[mi]
     const card=document.createElement("div")
     card.className="pack-card"
     card.innerHTML=`
       <img class="pack-thumb" src="${imgSrc(p.img)}" onerror="this.style.opacity=.25">
       <div class="pack-fields">
-        <div class="field"><label>Title</label><input data-f="title" data-i="${i}" value="${esc(p.title||"")}" placeholder="auto from filename if empty"></div>
-        <div class="field"><label>Category</label><select data-f="category" data-i="${i}">${catOptions(p.category||"")}</select></div>
+        <div class="field"><label>Title</label><input data-f="title" data-i="${mi}" value="${esc(p.title||"")}" placeholder="auto from filename if empty"></div>
+        <div class="field"><label>Category</label><select data-f="category" data-i="${mi}">${catOptions(p.category||"")}</select></div>
         <div class="field full"><label>Image path / URL</label>
           <div style="display:flex;gap:8px">
-            <input data-f="img" data-i="${i}" value="${esc(p.img||"")}" placeholder="images/example0.png" style="flex:1">
-            <button class="btn btn-ghost" data-upload="${i}" style="padding:9px 14px;font-size:12px;white-space:nowrap">Upload…</button>
+            <input data-f="img" data-i="${mi}" value="${esc(p.img||"")}" placeholder="images/example0.png" style="flex:1">
+            <button class="btn btn-ghost" data-upload="${mi}" style="padding:9px 14px;font-size:12px;white-space:nowrap">Upload…</button>
           </div>
         </div>
-        <div class="field full"><label>Download link (MEGA)</label><input data-f="link" data-i="${i}" value="${esc(p.link||"")}" placeholder="https://mega.nz/..."></div>
-        <div class="field"><label>Tags (comma separated)</label><input data-f="tags" data-i="${i}" value="${esc((p.tags||[]).join(", "))}" placeholder="performance, 2026"></div>
+        <div class="field full"><label>Download link (MEGA)</label><input data-f="link" data-i="${mi}" value="${esc(p.link||"")}" placeholder="https://mega.nz/..."></div>
+        <div class="field"><label>Tags (comma separated)</label><input data-f="tags" data-i="${mi}" value="${esc((p.tags||[]).join(", "))}" placeholder="performance, 2026"></div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div><label>Resolution</label><input data-f="res" data-i="${i}" value="${esc(p.res||"")}" placeholder="4K"></div>
-          <div><label>Storage size</label><input data-f="size" data-i="${i}" value="${esc(p.size||"")}" placeholder="1.2 GB"></div>
+          <div><label>Resolution</label><input data-f="res" data-i="${mi}" value="${esc(p.res||"")}" placeholder="4K"></div>
+          <div><label>Storage size</label><input data-f="size" data-i="${mi}" value="${esc(p.size||"")}" placeholder="1.2 GB"></div>
         </div>
         <div class="pack-actions">
           <div class="order-btns">
-            <button class="order-btn" data-pup="${i}" title="Move up" ${i===0?"disabled":""}>&#9650;</button>
-            <button class="order-btn" data-pdown="${i}" title="Move down" ${i===packs.length-1?"disabled":""}>&#9660;</button>
+            <button class="order-btn" data-pup="${pos}" title="Move up" ${pos===0?"disabled":""}>&#9650;</button>
+            <button class="order-btn" data-pdown="${pos}" title="Move down" ${pos===idxs.length-1?"disabled":""}>&#9660;</button>
           </div>
-          <button class="btn btn-danger" data-del="${i}">Delete pack</button>
+          <button class="btn btn-danger" data-del="${mi}">Delete pack</button>
         </div>
       </div>
     `
@@ -555,57 +644,46 @@ function renderPacks(){
         img.style.opacity=1
         img.src=imgSrc(el.value)
       }
+      if(f==="category"){
+        // pack moved to another category — it leaves this view
+        renderPacks()
+      }
     })
   })
 
   packList.querySelectorAll("[data-upload]").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const i=+btn.dataset.upload
-      const picker=document.createElement("input")
-      picker.type="file"
-      picker.accept="image/png,image/jpeg,image/gif,image/webp"
-      picker.addEventListener("change",async()=>{
-        const file=picker.files[0]
-        if(!file) return
-        btn.disabled=true
-        btn.textContent="Uploading…"
-        try{
-          const fd=new FormData()
-          fd.append("file",file)
-          const res=await fetch("/api/admin/upload",{method:"POST",body:fd})
-          const data=await res.json()
-          if(res.ok&&data.ok){
-            packs[i].img=data.path
-            renderPacks()
-          }else{
-            alert(data.error||"Upload failed.")
-          }
-        }catch(e){
-          alert("Upload failed — connection error.")
-        }
-        btn.disabled=false
-        btn.textContent="Upload…"
-      })
-      picker.click()
-    })
+    btn.addEventListener("click",()=>uploadImage(file=>{
+      packs[+btn.dataset.upload].img=file
+      renderPacks()
+    },btn))
   })
 
   packList.querySelectorAll("[data-pup]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      const i=+btn.dataset.pup
-      if(i>0){[packs[i-1],packs[i]]=[packs[i],packs[i-1]];renderPacks()}
+      const idxs=catIndices()
+      const pos=+btn.dataset.pup
+      if(pos>0){
+        const a=idxs[pos],b=idxs[pos-1]
+        ;[packs[a],packs[b]]=[packs[b],packs[a]]
+        renderPacks()
+      }
     })
   })
   packList.querySelectorAll("[data-pdown]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      const i=+btn.dataset.pdown
-      if(i<packs.length-1){[packs[i+1],packs[i]]=[packs[i],packs[i+1]];renderPacks()}
+      const idxs=catIndices()
+      const pos=+btn.dataset.pdown
+      if(pos<idxs.length-1){
+        const a=idxs[pos],b=idxs[pos+1]
+        ;[packs[a],packs[b]]=[packs[b],packs[a]]
+        renderPacks()
+      }
     })
   })
 
   packList.querySelectorAll("[data-del]").forEach(btn=>{
     btn.addEventListener("click",()=>{
-      if(confirm("Delete this scenepack? (Not final until you hit Save)")){
+      if(confirm("Delete this scenepack? (Not final until Save)")){
         packs.splice(+btn.dataset.del,1)
         renderPacks()
       }
@@ -613,14 +691,48 @@ function renderPacks(){
   })
 }
 
+/* ---------- shared upload picker ---------- */
+
+function uploadImage(onDone,btn){
+  const picker=document.createElement("input")
+  picker.type="file"
+  picker.accept="image/png,image/jpeg,image/gif,image/webp"
+  picker.addEventListener("change",async()=>{
+    const file=picker.files[0]
+    if(!file) return
+    const label=btn.textContent
+    btn.disabled=true
+    btn.textContent="Uploading…"
+    try{
+      const fd=new FormData()
+      fd.append("file",file)
+      const res=await fetch("/api/admin/upload",{method:"POST",body:fd})
+      const out=await res.json()
+      if(res.ok&&out.ok){
+        onDone(out.path)
+      }else{
+        alert(out.error||"Upload failed.")
+      }
+    }catch(e){
+      alert("Upload failed — connection error.")
+    }
+    btn.disabled=false
+    btn.textContent=label
+  })
+  picker.click()
+}
+
+/* ---------- top-level wiring ---------- */
+
 document.getElementById("tabMain").addEventListener("click",()=>switchTab("main"))
 document.getElementById("tabExclusive").addEventListener("click",()=>switchTab("exclusive"))
+document.getElementById("backToCats").addEventListener("click",showCatView)
 
 document.getElementById("delAllCats").addEventListener("click",()=>{
   if(categories.length===0) return
-  if(confirm("Delete ALL categories on this tab? Packs keep their category text but it will show under Other until you make new categories. (Not final until Save)")){
+  if(confirm("Delete ALL categories on this tab? Packs move to Uncategorised. (Not final until Save)")){
     categories.length=0
-    renderCats();renderPacks()
+    renderCats()
   }
 })
 
@@ -629,13 +741,18 @@ document.getElementById("addCatBtn").addEventListener("click",()=>{
   if(!v)return
   if(!categories.some(c=>c.name===v))categories.unshift({name:v,img:"",added:Date.now()})
   document.getElementById("newCat").value=""
-  renderCats();renderPacks()
+  renderCats()
 })
 
 document.getElementById("addPackBtn").addEventListener("click",()=>{
-  packs.unshift({img:"",link:"",title:"",category:"",tags:[],res:"",size:"",added:Date.now()})
+  packs.unshift({
+    img:"",link:"",title:"",
+    category:currentCat===UNCAT?"":currentCat,
+    tags:[],res:"",size:"",
+    added:Date.now()
+  })
   renderPacks()
-  window.scrollTo({top:packList.offsetTop-80,behavior:"smooth"})
+  window.scrollTo({top:packList.offsetTop-120,behavior:"smooth"})
 })
 
 document.getElementById("saveBtn").addEventListener("click",async()=>{
@@ -678,6 +795,8 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
   btn.disabled=false
   btn.textContent="Save all changes"
 })
+
+/* ---------- boot ---------- */
 
 async function init(){
   let me
@@ -731,8 +850,7 @@ async function init(){
 
   panel.style.display="block"
   savebar.style.display="flex"
-  renderCats()
-  renderPacks()
+  showCatView()
 }
 
 init()
