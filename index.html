@@ -1124,21 +1124,31 @@ function categoryData(){
   const map=new Map()
   packs.forEach((p,i)=>{
     const c=packCategory(p)
-    if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img})
-    map.get(c).count++
+    if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img,latest:0})
+    const entry=map.get(c)
+    entry.count++
+    entry.latest=Math.max(entry.latest,p.added||0)
   })
   const out=[]
   order.forEach(c=>{
     if(map.has(c.name)){
       const entry=map.get(c.name)
       if(c.img) entry.cover=c.img   // category's own thumbnail wins
-      entry.added=c.added||0
+      entry.added=Math.max(c.added||0,entry.latest)   // new pack inside = category counts as new
       out.push(entry)
       map.delete(c.name)
     }
   })
-  ;[...map.keys()].sort().forEach(c=>out.push(map.get(c)))
-  return out
+  ;[...map.keys()].sort().forEach(c=>{
+    const entry=map.get(c)
+    entry.added=entry.latest
+    out.push(entry)
+  })
+  // categories with fresh content float to the top, newest first;
+  // everything else keeps the admin's manual order
+  const fresh=out.filter(e=>isNew(e)).sort((a,b)=>(b.added||0)-(a.added||0))
+  const rest=out.filter(e=>!isNew(e))
+  return [...fresh,...rest]
 }
 
 function updateStats(mode,count,label){
