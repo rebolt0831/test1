@@ -875,6 +875,24 @@ footer{
   .social-icons a[aria-label]{display:none;}
 }
 
+
+/* 7-day NEW badge */
+.new-badge{
+  position:absolute;
+  top:10px;
+  left:10px;
+  z-index:2;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.5px;
+  color:#18181b;
+  background:var(--accent-2);
+  padding:4px 8px;
+  border-radius:6px;
+  pointer-events:none;
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
@@ -1043,6 +1061,14 @@ function imgSrc(path){
   return path
 }
 
+function isNew(item){
+  return item&&item.added&&(Date.now()-item.added)<7*24*60*60*1000
+}
+
+function newBadge(item){
+  return isNew(item)?'<span class="new-badge">NEW</span>':""
+}
+
 function packTitle(pack){
   return (pack.title&&pack.title.trim())?pack.title.trim():formatTitle(pack.img)
 }
@@ -1090,7 +1116,7 @@ function packCategory(pack){
 
 function normCats(){
   // categories may be strings (old data) or {name, img}
-  return categories.map(c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}).filter(c=>c.name)
+  return categories.map(c=>typeof c==="string"?{name:c,img:"",added:0}:{name:c.name||"",img:c.img||"",added:c.added||0}).filter(c=>c.name)
 }
 
 function categoryData(){
@@ -1106,6 +1132,7 @@ function categoryData(){
     if(map.has(c.name)){
       const entry=map.get(c.name)
       if(c.img) entry.cover=c.img   // category's own thumbnail wins
+      entry.added=c.added||0
       out.push(entry)
       map.delete(c.name)
     }
@@ -1132,6 +1159,7 @@ function createPackCard(pack,idx){
   card.className="card"
   const title=packTitle(pack)
   card.innerHTML=`
+    ${newBadge(pack)}
     <a href="?pack=${idx}">
       <img src="${imgSrc(pack.img)}" loading="lazy" alt="${title}">
       <div class="card-overlay">
@@ -1147,6 +1175,7 @@ function createCategoryCard(cat){
   const card=document.createElement("div")
   card.className="card cat-card"
   card.innerHTML=`
+    ${newBadge(cat)}
     <a href="?cat=${encodeURIComponent(cat.name)}">
       <img src="${imgSrc(cat.cover)}" loading="lazy" alt="${cat.name}">
       <div class="card-overlay">
@@ -1276,6 +1305,7 @@ function renderDetail(id){
     a.className="more-card"
     a.href=`?pack=${i}`
     a.innerHTML=`
+      ${newBadge(p)}
       <img src="${imgSrc(p.img)}" loading="lazy" alt="${packTitle(p)}">
       <div class="card-overlay">
         <span class="card-title">${packTitle(p)}</span>
