@@ -93,6 +93,23 @@ a{color:inherit;}
 .btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--line);}
 .btn-danger{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.35);padding:8px 12px;font-size:12px;}
 
+.order-btns{display:flex;gap:6px;margin-right:auto;}
+
+.order-btn{
+  width:34px;height:34px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:8px;
+  color:var(--text-muted);
+  cursor:pointer;
+  font-size:13px;
+  transition:color .15s ease, background .15s ease;
+}
+
+.order-btn:hover{color:var(--text);background:var(--surface);}
+.order-btn:disabled{opacity:.3;cursor:not-allowed;}
+
 .wrap{max-width:1100px;margin:0 auto;padding:28px 24px 120px;}
 
 .tabs{display:flex;gap:8px;margin-top:6px;}
@@ -399,7 +416,11 @@ function renderCats(){
             <button class="btn btn-ghost" data-cupload="${i}" style="padding:9px 14px;font-size:12px;white-space:nowrap">Upload…</button>
           </div>
         </div>
-        <div class="full" style="display:flex;justify-content:flex-end">
+        <div class="full" style="display:flex;justify-content:flex-end;align-items:center">
+          <div class="order-btns">
+            <button class="order-btn" data-cup="${i}" title="Move up" ${i===0?"disabled":""}>&#9650;</button>
+            <button class="order-btn" data-cdown="${i}" title="Move down" ${i===categories.length-1?"disabled":""}>&#9660;</button>
+          </div>
           <button class="btn btn-danger" data-cdel="${i}">Delete category</button>
         </div>
       </div>
@@ -456,6 +477,19 @@ function renderCats(){
     })
   })
 
+  catList.querySelectorAll("[data-cup]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i=+btn.dataset.cup
+      if(i>0){[categories[i-1],categories[i]]=[categories[i],categories[i-1]];renderCats();renderPacks()}
+    })
+  })
+  catList.querySelectorAll("[data-cdown]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i=+btn.dataset.cdown
+      if(i<categories.length-1){[categories[i+1],categories[i]]=[categories[i],categories[i+1]];renderCats();renderPacks()}
+    })
+  })
+
   catList.querySelectorAll("[data-cdel]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       if(confirm("Delete this category? Packs keep working, they just show under an auto-guessed category. (Not final until Save)")){
@@ -496,7 +530,13 @@ function renderPacks(){
           <div><label>Resolution</label><input data-f="res" data-i="${i}" value="${esc(p.res||"")}" placeholder="4K"></div>
           <div><label>Storage size</label><input data-f="size" data-i="${i}" value="${esc(p.size||"")}" placeholder="1.2 GB"></div>
         </div>
-        <div class="pack-actions"><button class="btn btn-danger" data-del="${i}">Delete pack</button></div>
+        <div class="pack-actions">
+          <div class="order-btns">
+            <button class="order-btn" data-pup="${i}" title="Move up" ${i===0?"disabled":""}>&#9650;</button>
+            <button class="order-btn" data-pdown="${i}" title="Move down" ${i===packs.length-1?"disabled":""}>&#9660;</button>
+          </div>
+          <button class="btn btn-danger" data-del="${i}">Delete pack</button>
+        </div>
       </div>
     `
     packList.appendChild(card)
@@ -550,6 +590,19 @@ function renderPacks(){
     })
   })
 
+  packList.querySelectorAll("[data-pup]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i=+btn.dataset.pup
+      if(i>0){[packs[i-1],packs[i]]=[packs[i],packs[i-1]];renderPacks()}
+    })
+  })
+  packList.querySelectorAll("[data-pdown]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const i=+btn.dataset.pdown
+      if(i<packs.length-1){[packs[i+1],packs[i]]=[packs[i],packs[i+1]];renderPacks()}
+    })
+  })
+
   packList.querySelectorAll("[data-del]").forEach(btn=>{
     btn.addEventListener("click",()=>{
       if(confirm("Delete this scenepack? (Not final until you hit Save)")){
@@ -574,13 +627,13 @@ document.getElementById("delAllCats").addEventListener("click",()=>{
 document.getElementById("addCatBtn").addEventListener("click",()=>{
   const v=document.getElementById("newCat").value.trim()
   if(!v)return
-  if(!categories.some(c=>c.name===v))categories.push({name:v,img:""})
+  if(!categories.some(c=>c.name===v))categories.unshift({name:v,img:"",added:Date.now()})
   document.getElementById("newCat").value=""
   renderCats();renderPacks()
 })
 
 document.getElementById("addPackBtn").addEventListener("click",()=>{
-  packs.unshift({img:"",link:"",title:"",category:"",tags:[],res:"",size:""})
+  packs.unshift({img:"",link:"",title:"",category:"",tags:[],res:"",size:"",added:Date.now()})
   renderPacks()
   window.scrollTo({top:packList.offsetTop-80,behavior:"smooth"})
 })
@@ -655,9 +708,10 @@ async function init(){
 
   const normPack=p=>({
     img:p.img||"",link:p.link||"",title:p.title||"",
-    category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||""
+    category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||"",
+    added:p.added||0
   })
-  const normCat=c=>typeof c==="string"?{name:c,img:""}:{name:c.name||"",img:c.img||""}
+  const normCat=c=>typeof c==="string"?{name:c,img:"",added:0}:{name:c.name||"",img:c.img||"",added:c.added||0}
 
   const res=await fetch("/api/packs")
   const mainData=await res.json()
