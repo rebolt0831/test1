@@ -4,23 +4,26 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" type="image/png" href="../images/favicon.png">
 <meta name="robots" content="noindex">
 
 <title>Admin — sceneagb</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
-  --bg:#18181b;
-  --surface:#222225;
-  --surface-2:#2b2b2f;
-  --line:rgba(255,255,255,.1);
+  --bg:#2E2210;
+  --surface:#3A2D17;
+  --surface-2:#46381D;
+  --line:rgba(247,244,239,.14);
   --text:#f5f5f4;
-  --text-muted:#a3a3a8;
+  --text-muted:#f7f4ef;
+  --header-ink:#f7f4ef;
   --accent:#ff3d7a;
   --accent-2:#c9a47e;
   --discord:#5865F2;
@@ -31,10 +34,11 @@ html.light{
   --bg:#f7f4ef;
   --surface:#ffffff;
   --surface-2:#efe9e0;
-  --line:rgba(30,22,12,.12);
+  --line:rgba(46,34,16,.15);
   --text:#1a1712;
-  --text-muted:#7a7168;
+  --text-muted:#2E2210;
   --accent-2:#a5764a;
+  --header-ink:#2E2210;
 }
 
 *{box-sizing:border-box;}
@@ -43,7 +47,7 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:'JetBrains Mono',monospace;
   -webkit-font-smoothing:antialiased;
 }
 
@@ -82,14 +86,14 @@ a{color:inherit;}
   padding:11px 18px;
   font-weight:800;
   font-size:13px;
-  font-family:'Inter',sans-serif;
+  font-family:'JetBrains Mono',monospace;
   transition:transform .15s ease, filter .15s ease, opacity .15s ease;
 }
 
 .btn:hover{transform:translateY(-1px);filter:brightness(1.08);}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
-.btn-primary{background:var(--accent);color:#18181b;}
+.btn-primary{background:var(--accent);color:#2E2210;}
 .btn-ghost{background:var(--surface);color:var(--text);border:1px solid var(--line);}
 .btn-danger{background:transparent;color:#f87171;border:1px solid rgba(248,113,113,.35);padding:8px 12px;font-size:12px;}
 
@@ -99,7 +103,7 @@ a{color:inherit;}
   background:none;border:none;cursor:pointer;
   color:var(--text-muted);
   font-size:13px;
-  font-family:'Inter',sans-serif;
+  font-family:'JetBrains Mono',monospace;
   padding:0;
   margin-top:6px;
   transition:color .2s ease;
@@ -163,7 +167,7 @@ a{color:inherit;}
   transition:color .2s ease, background .2s ease;
 }
 
-.tab.active{background:var(--accent);border-color:var(--accent);color:#18181b;}
+.tab.active{background:var(--accent);border-color:var(--accent);color:#2E2210;}
 
 .danger-link{
   background:none;border:none;cursor:pointer;
@@ -250,7 +254,7 @@ input,select{
   background:var(--surface-2);
   color:var(--text);
   font-size:13px;
-  font-family:'Inter',sans-serif;
+  font-family:'JetBrains Mono',monospace;
 }
 
 input:focus,select:focus{outline:2px solid rgba(150,150,150,.4);outline-offset:1px;}
