@@ -5,6 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="icon" type="image/png" href="../images/favicon.png">
+
 
 <title>Exclusive — sceneagb</title>
 
@@ -13,18 +15,19 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
   --card-shadow:0 14px 34px rgba(0,0,0,.5);
-  --bg:#18181b;
-  --surface:#222225;
-  --surface-2:#2b2b2f;
-  --line:rgba(255,255,255,.1);
+  --bg:#2E2210;
+  --surface:#3A2D17;
+  --surface-2:#46381D;
+  --line:rgba(247,244,239,.14);
   --text:#f5f5f4;
-  --text-muted:#a3a3a8;
+  --text-muted:#f7f4ef;
+  --header-ink:#f7f4ef;
   --accent:#ff3d7a;
   --accent-2:#c9a47e;
 }
@@ -37,11 +40,11 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:'JetBrains Mono',monospace;
   -webkit-font-smoothing:antialiased;
 }
 
-::selection{background:var(--accent-2);color:#18181b;}
+::selection{background:var(--accent-2);color:#2E2210;}
 
 .mono{font-family:'JetBrains Mono',monospace;}
 
@@ -62,7 +65,7 @@ a{color:inherit;}
 }
 
 .site-header.scrolled{
-  background:rgba(24,24,27,.85);
+  background:rgba(46,34,16,.85);
   backdrop-filter:blur(14px);
   padding:14px 32px;
   border-bottom:1px solid var(--line);
@@ -75,7 +78,8 @@ nav.main-nav{
 
 nav.main-nav a{
   text-decoration:none;
-  color:rgba(8,8,12,.78);
+  color:var(--header-ink);
+  opacity:.75;
   font-size:14px;
   letter-spacing:1.5px;
   text-transform:uppercase;
@@ -85,8 +89,8 @@ nav.main-nav a{
   transition:color .25s ease;
 }
 
-nav.main-nav a:hover{color:#08080c;}
-nav.main-nav a.active{color:#08080c;}
+nav.main-nav a:hover{opacity:1;}
+nav.main-nav a.active{opacity:1;}
 
 nav.main-nav a.active::after{
   content:"";
@@ -96,9 +100,7 @@ nav.main-nav a.active::after{
   background:currentColor;
 }
 
-.site-header.scrolled nav.main-nav a{color:var(--text-muted);}
-.site-header.scrolled nav.main-nav a:hover,
-.site-header.scrolled nav.main-nav a.active{color:var(--text);}
+.site-header.scrolled nav.main-nav a{color:var(--text);}
 
 .social-icons{
   display:flex;
@@ -110,14 +112,14 @@ nav.main-nav a.active::after{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  color:#08080c;
+  color:var(--header-ink);
   opacity:.85;
   transition:color .25s ease, opacity .25s ease, transform .2s ease;
 }
 
 .social-icons a:hover{opacity:1;transform:translateY(-1px);}
 
-.site-header.scrolled .social-icons a{color:var(--text);}
+
 
 .social-icons svg{width:19px;height:19px;display:block;}
 
@@ -140,7 +142,7 @@ nav.main-nav a.active::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg, rgba(24,24,27,.15) 0%, rgba(24,24,27,.05) 40%, var(--bg) 100%);
+  background:linear-gradient(180deg, rgba(46,34,16,.15) 0%, rgba(46,34,16,.05) 40%, var(--bg) 100%);
 }
 
 /* ---------- TOOLBAR ---------- */
@@ -239,7 +241,7 @@ nav.main-nav a.active::after{
   position:absolute;
   left:0; right:0; bottom:0;
   padding:14px 12px 12px;
-  background:linear-gradient(0deg, rgba(24,24,27,.95), transparent);
+  background:linear-gradient(0deg, rgba(46,34,16,.95), transparent);
   display:flex;
   flex-direction:column;
   gap:6px;
@@ -624,7 +626,7 @@ footer{
   font-size:13px;
   cursor:pointer;
   background:none;border:none;
-  font-family:'Inter',sans-serif;
+  font-family:'JetBrains Mono',monospace;
   padding:0;
   transition:color .2s ease;
 }
@@ -655,7 +657,7 @@ footer{
   padding:8px 10px;
   border:none;
   border-radius:8px;
-  color:#08080c;
+  color:var(--header-ink);
   font-size:11.5px;
   font-weight:800;
   letter-spacing:1.2px;
@@ -665,8 +667,8 @@ footer{
   transition:background .25s ease, color .25s ease;
 }
 
-.login-btn:hover{background:rgba(8,8,12,.08);}
-.site-header.scrolled .login-btn{color:var(--text);}
+.login-btn:hover{background:rgba(128,110,80,.18);}
+
 .site-header.scrolled .login-btn:hover{background:rgba(255,255,255,.08);}
 
 .account-menu{
@@ -730,11 +732,9 @@ footer{
   width:22px;
   height:2.5px;
   border-radius:2px;
-  background:#08080c;
+  background:var(--header-ink);
   transition:background .25s ease;
 }
-
-.site-header.scrolled .menu-btn span{background:var(--text);}
 
 .drawer{
   position:fixed;
@@ -758,7 +758,7 @@ footer{
 
 /* fallback for browsers without color-mix */
 @supports not (background: color-mix(in srgb, red 50%, blue)){
-  .drawer{background:rgba(24,24,27,.88);}
+  .drawer{background:rgba(46,34,16,.88);}
   html.light .drawer{background:rgba(247,244,239,.9);}
 }
 
@@ -1007,7 +1007,7 @@ footer{
   font-size:10px;
   font-weight:700;
   letter-spacing:1.5px;
-  color:#18181b;
+  color:#2E2210;
   background:var(--accent-2);
   padding:4px 8px;
   border-radius:6px;
@@ -1021,10 +1021,11 @@ html.light{
   --bg:#f7f4ef;
   --surface:#ffffff;
   --surface-2:#efe9e0;
-  --line:rgba(30,22,12,.12);
+  --line:rgba(46,34,16,.15);
   --text:#1a1712;
-  --text-muted:#7a7168;
+  --text-muted:#2E2210;
   --accent-2:#a5764a;
+  --header-ink:#2E2210;
 }
 
 html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
@@ -1037,13 +1038,13 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   border:none;
   padding:0;
   cursor:pointer;
-  color:#08080c;
+  color:var(--header-ink);
   opacity:.85;
   transition:opacity .25s ease, transform .2s ease, color .25s ease;
 }
 
 .theme-toggle:hover{opacity:1;transform:translateY(-1px);}
-.site-header.scrolled .theme-toggle{color:var(--text);}
+
 .theme-toggle svg{width:19px;height:19px;display:block;}
 
 </style>
