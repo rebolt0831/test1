@@ -5,22 +5,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="icon" type="image/png" href="../images/favicon.png">
+
 <title>About — sceneagb</title>
 <meta name="description" content="About sceneagb, a fan-run archive of Ariana Grande scenepacks for editors.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
 
 :root{
-  --bg:#18181b;
-  --surface:#222225;
-  --surface-2:#2b2b2f;
-  --line:rgba(255,255,255,.1);
+  --bg:#2E2210;
+  --surface:#3A2D17;
+  --surface-2:#46381D;
+  --line:rgba(247,244,239,.14);
   --text:#f5f5f4;
-  --text-muted:#a3a3a8;
+  --text-muted:#f7f4ef;
+  --header-ink:#f7f4ef;
   --accent:#ff3d7a;
   --accent-2:#c9a47e;
   --discord:#5865F2;
@@ -32,11 +35,11 @@ body{
   margin:0;
   background:var(--bg);
   color:var(--text);
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-family:'JetBrains Mono',monospace;
   -webkit-font-smoothing:antialiased;
 }
 
-::selection{background:var(--accent-2);color:#18181b;}
+::selection{background:var(--accent-2);color:#2E2210;}
 
 .mono{font-family:'JetBrains Mono',monospace;}
 a{color:inherit;}
@@ -56,7 +59,7 @@ a{color:inherit;}
 }
 
 .site-header.scrolled{
-  background:rgba(24,24,27,.85);
+  background:rgba(46,34,16,.85);
   backdrop-filter:blur(14px);
   padding:14px 32px;
   border-bottom:1px solid var(--line);
@@ -66,7 +69,8 @@ nav.main-nav{display:flex;gap:34px;}
 
 nav.main-nav a{
   text-decoration:none;
-  color:rgba(8,8,12,.78);
+  color:var(--header-ink);
+  opacity:.75;
   font-size:14px;
   letter-spacing:1.5px;
   text-transform:uppercase;
@@ -76,8 +80,8 @@ nav.main-nav a{
   transition:color .25s ease;
 }
 
-nav.main-nav a:hover{color:#08080c;}
-nav.main-nav a.active{color:#08080c;}
+nav.main-nav a:hover{opacity:1;}
+nav.main-nav a.active{opacity:1;}
 
 nav.main-nav a.active::after{
   content:"";
@@ -87,9 +91,7 @@ nav.main-nav a.active::after{
   background:currentColor;
 }
 
-.site-header.scrolled nav.main-nav a{color:var(--text-muted);}
-.site-header.scrolled nav.main-nav a:hover,
-.site-header.scrolled nav.main-nav a.active{color:var(--text);}
+.site-header.scrolled nav.main-nav a{color:var(--text);}
 
 .social-icons{display:flex;align-items:center;gap:20px;}
 
@@ -97,14 +99,14 @@ nav.main-nav a.active::after{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  color:#08080c;
+  color:var(--header-ink);
   opacity:.85;
   transition:color .25s ease, opacity .25s ease, transform .2s ease;
 }
 
 .social-icons a:hover{opacity:1;transform:translateY(-1px);}
 
-.site-header.scrolled .social-icons a{color:var(--text);}
+
 
 .social-icons svg{width:19px;height:19px;display:block;}
 
@@ -127,7 +129,7 @@ nav.main-nav a.active::after{
   content:"";
   position:absolute;
   inset:0;
-  background:linear-gradient(180deg, rgba(24,24,27,.1) 0%, rgba(24,24,27,.02) 40%, var(--bg) 100%);
+  background:linear-gradient(180deg, rgba(46,34,16,.1) 0%, rgba(46,34,16,.02) 40%, var(--bg) 100%);
 }
 
 .page-head{
@@ -251,7 +253,7 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   padding:8px 10px;
   border:none;
   border-radius:8px;
-  color:#08080c;
+  color:var(--header-ink);
   font-size:11.5px;
   font-weight:800;
   letter-spacing:1.2px;
@@ -261,8 +263,8 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   transition:background .25s ease, color .25s ease;
 }
 
-.login-btn:hover{background:rgba(8,8,12,.08);}
-.site-header.scrolled .login-btn{color:var(--text);}
+.login-btn:hover{background:rgba(128,110,80,.18);}
+
 .site-header.scrolled .login-btn:hover{background:rgba(255,255,255,.08);}
 
 .account-menu{
@@ -326,11 +328,9 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
   width:22px;
   height:2.5px;
   border-radius:2px;
-  background:#08080c;
+  background:var(--header-ink);
   transition:background .25s ease;
 }
-
-.site-header.scrolled .menu-btn span{background:var(--text);}
 
 .drawer{
   position:fixed;
@@ -354,7 +354,7 @@ footer{border-top:1px solid var(--line);padding:56px 32px 40px;text-align:center
 
 /* fallback for browsers without color-mix */
 @supports not (background: color-mix(in srgb, red 50%, blue)){
-  .drawer{background:rgba(24,24,27,.88);}
+  .drawer{background:rgba(46,34,16,.88);}
   html.light .drawer{background:rgba(247,244,239,.9);}
 }
 
@@ -475,10 +475,11 @@ html.light{
   --bg:#f7f4ef;
   --surface:#ffffff;
   --surface-2:#efe9e0;
-  --line:rgba(30,22,12,.12);
+  --line:rgba(46,34,16,.15);
   --text:#1a1712;
-  --text-muted:#7a7168;
+  --text-muted:#2E2210;
   --accent-2:#a5764a;
+  --header-ink:#2E2210;
 }
 
 html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
@@ -491,13 +492,13 @@ html.light .site-header.scrolled{background:rgba(247,244,239,.88);}
   border:none;
   padding:0;
   cursor:pointer;
-  color:#08080c;
+  color:var(--header-ink);
   opacity:.85;
   transition:opacity .25s ease, transform .2s ease, color .25s ease;
 }
 
 .theme-toggle:hover{opacity:1;transform:translateY(-1px);}
-.site-header.scrolled .theme-toggle{color:var(--text);}
+
 .theme-toggle svg{width:19px;height:19px;display:block;}
 
 </style>
