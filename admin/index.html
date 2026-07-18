@@ -788,6 +788,9 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
     if(res.ok&&result.ok){
       saveStatus.classList.add("ok")
       saveStatus.textContent=`Saved ${result.saved} packs — live now.`
+    }else if(res.status===403){
+      saveStatus.classList.add("err")
+      saveStatus.textContent="Access denied — your team role may have been removed."
     }else{
       saveStatus.classList.add("err")
       saveStatus.textContent=result.error||"Save failed."
@@ -803,10 +806,11 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
 /* ---------- boot ---------- */
 
 async function init(){
-  let me
+  let check
   try{
-    const res=await fetch("/api/me")
-    me=await res.json()
+    const res=await fetch("/api/admin/check")
+    check=await res.json()
+    check.status=res.status
   }catch(e){
     gate.style.display="block"
     gateTitle.textContent="Backend not available"
@@ -814,19 +818,19 @@ async function init(){
     return
   }
 
-  if(!me.loggedIn){
+  if(check.status===401||check.reason==="login"){
     gate.style.display="block"
     return
   }
 
-  if(!me.isAdmin){
+  if(!check.ok){
     gate.style.display="block"
     gateTitle.textContent="Team members only"
-    gateText.textContent="You're logged in as "+me.username+", but this area needs a team role in the sceneagb Discord."
+    gateText.textContent="This area needs a team role in the sceneagb Discord. If you were recently removed from the team, your access has ended."
     return
   }
 
-  document.getElementById("adminName").textContent=me.username
+  document.getElementById("adminName").textContent=check.username
   topbarRight.style.display="flex"
 
   const normPack=p=>({
