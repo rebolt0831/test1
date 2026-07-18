@@ -1493,7 +1493,7 @@ function showGate(mode,name){
   if(mode==="backend"){
     t.textContent="This page needs the site to be hosted on Cloudflare Pages with Discord login configured."
   }else if(mode==="role"){
-    t.textContent="You're logged in as "+name+", but only active server boosters can enter. Boost the sceneagb Discord, then log out and back in to verify."
+    t.textContent="You're logged in as "+name+", but only active server boosters can enter. Boost the sceneagb Discord, then refresh this page."
   }
 }
 
@@ -1513,7 +1513,20 @@ async function loadData(){
     return
   }
 
-  if(!me.hasExclusive){
+  // ask the server — it re-checks the booster role live when a bot token is configured
+  let res
+  try{
+    res=await fetch("/api/exclusive-packs")
+  }catch(e){
+    showGate("backend")
+    return
+  }
+
+  if(res.status===401){
+    showGate("login")
+    return
+  }
+  if(res.status===403){
     showGate("role",me.username)
     return
   }
@@ -1524,7 +1537,6 @@ async function loadData(){
   document.getElementById("userName").textContent=me.username
 
   try{
-    const res=await fetch("/api/exclusive-packs")
     const ex=await res.json()
     packs=Array.isArray(ex)?ex:(ex.packs||[])
     categories=Array.isArray(ex)?[]:(ex.categories||[])
