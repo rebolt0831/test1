@@ -391,7 +391,10 @@ input::placeholder{color:var(--text-muted);}
   <div id="packView" style="display:none">
     <button class="back-btn" id="backToCats">&#8592; All categories</button>
     <div class="section-title" id="packViewTitle"></div>
-    <button class="btn btn-ghost" id="addPackBtn" style="margin-bottom:14px">+ Add scenepack to this category</button>
+    <div style="display:flex;align-items:center;gap:4px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="btn btn-ghost" id="addPackBtn">+ Add scenepack to this category</button>
+      <button class="danger-link" id="delAllPacks">delete all packs in here</button>
+    </div>
     <div class="pack-list" id="packList"></div>
     <div class="hint">
       <strong>Thumbnails — three ways:</strong> hit <code>Upload…</code> to upload straight from your device (needs R2, see SETUP.md), put the file in the repo's <code>images/</code> folder and type the path, or paste any https image URL. Changing a pack's <strong>Category</strong> dropdown moves it to that category. Remember to <strong>Save all changes</strong>.
@@ -765,6 +768,36 @@ document.getElementById("addCatBtn").addEventListener("click",()=>{
   if(!categories.some(c=>c.name===v))categories.unshift({name:v,img:"",added:Date.now()})
   document.getElementById("newCat").value=""
   renderCats()
+})
+
+let delPacksTimer=null
+const delAllPacksBtn=document.getElementById("delAllPacks")
+
+delAllPacksBtn.addEventListener("click",()=>{
+  const count=catIndices().length
+  if(count===0){
+    delAllPacksBtn.textContent="nothing to delete"
+    clearTimeout(delPacksTimer)
+    delPacksTimer=setTimeout(()=>{delAllPacksBtn.textContent="delete all packs in here"},2000)
+    return
+  }
+  if(delAllPacksBtn.dataset.armed==="1"){
+    for(let i=packs.length-1;i>=0;i--){
+      if(inCat(packs[i],currentCat)) packs.splice(i,1)
+    }
+    delete delAllPacksBtn.dataset.armed
+    delAllPacksBtn.textContent="delete all packs in here"
+    clearTimeout(delPacksTimer)
+    renderPacks()
+  }else{
+    delAllPacksBtn.dataset.armed="1"
+    delAllPacksBtn.textContent="click again to permanently remove "+count+" packs"
+    clearTimeout(delPacksTimer)
+    delPacksTimer=setTimeout(()=>{
+      delete delAllPacksBtn.dataset.armed
+      delAllPacksBtn.textContent="delete all packs in here"
+    },4000)
+  }
 })
 
 document.getElementById("addPackBtn").addEventListener("click",()=>{
