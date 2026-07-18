@@ -732,11 +732,30 @@ document.getElementById("tabMain").addEventListener("click",()=>switchTab("main"
 document.getElementById("tabExclusive").addEventListener("click",()=>switchTab("exclusive"))
 document.getElementById("backToCats").addEventListener("click",showCatView)
 
-document.getElementById("delAllCats").addEventListener("click",()=>{
-  if(categories.length===0) return
-  if(confirm("Delete ALL categories on this tab? Packs move to Uncategorised. (Not final until Save)")){
+let delAllTimer=null
+const delAllBtn=document.getElementById("delAllCats")
+
+delAllBtn.addEventListener("click",()=>{
+  if(categories.length===0){
+    delAllBtn.textContent="nothing to delete"
+    clearTimeout(delAllTimer)
+    delAllTimer=setTimeout(()=>{delAllBtn.textContent="delete all"},2000)
+    return
+  }
+  if(delAllBtn.dataset.armed==="1"){
     categories.length=0
+    delete delAllBtn.dataset.armed
+    delAllBtn.textContent="delete all"
+    clearTimeout(delAllTimer)
     renderCats()
+  }else{
+    delAllBtn.dataset.armed="1"
+    delAllBtn.textContent="click again to confirm — packs move to Uncategorised"
+    clearTimeout(delAllTimer)
+    delAllTimer=setTimeout(()=>{
+      delete delAllBtn.dataset.armed
+      delAllBtn.textContent="delete all"
+    },4000)
   }
 })
 
