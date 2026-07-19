@@ -1117,6 +1117,12 @@ function guessCategory(title){
   return "Other"
 }
 
+function packAlso(pack){
+  const adminNames=normCats().map(c=>c.name)
+  const primary=packCategory(pack)
+  return (pack.also||[]).filter(a=>adminNames.includes(a)&&a!==primary)
+}
+
 function packCategory(pack){
   const set=(pack.category&&pack.category.trim())?pack.category.trim():""
   const adminCats=normCats().map(c=>c.name)
@@ -1136,11 +1142,13 @@ function categoryData(){
   const order=normCats()
   const map=new Map()
   packs.forEach((p,i)=>{
-    const c=packCategory(p)
-    if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img,latest:0})
-    const entry=map.get(c)
-    entry.count++
-    entry.latest=Math.max(entry.latest,p.added||0)
+    const cats=[packCategory(p),...packAlso(p)]
+    cats.forEach(c=>{
+      if(!map.has(c)) map.set(c,{name:c,count:0,cover:p.img,latest:0})
+      const entry=map.get(c)
+      entry.count++
+      entry.latest=Math.max(entry.latest,p.added||0)
+    })
   })
   const out=[]
   order.forEach(c=>{
@@ -1229,7 +1237,7 @@ function showCategoryPacks(cat){
   currentCat=cat
   browseBar.classList.add("visible")
   browseTitle.textContent=cat
-  activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat)
+  activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat||packAlso(pack).includes(cat))
   updateStats("category",activeList.length,cat)
   grid.innerHTML=""
   renderedCount=0
@@ -1246,7 +1254,7 @@ function showSearchResults(q){
   const ql=q.toLowerCase()
   activeList=packs.map((p,i)=>({pack:p,idx:i}))
     .filter(({pack})=>{
-      const hay=(packTitle(pack)+" "+(pack.tags||[]).join(" ")+" "+(pack.category||"")).toLowerCase()
+      const hay=(packTitle(pack)+" "+(pack.tags||[]).join(" ")+" "+(pack.category||"")+" "+packAlso(pack).join(" ")).toLowerCase()
       return hay.includes(ql)
     })
   updateStats("search",activeList.length)
@@ -1318,7 +1326,7 @@ function renderDetail(id){
   moreGrid.innerHTML=""
   document.querySelector(".more-heading").textContent="MORE FROM "+category.toUpperCase()
 
-  const sameCat=packs.map((p,i)=>i).filter(i=>i!==id&&packCategory(packs[i])===category)
+  const sameCat=packs.map((p,i)=>i).filter(i=>i!==id&&(packCategory(packs[i])===category||packAlso(packs[i]).includes(category)))
   const picks=sameCat.slice(0,4)
   document.querySelector(".more-section").style.display=picks.length?"":"none"
 
