@@ -129,6 +129,28 @@ a{color:inherit;}
 
 .manage-btn:hover{background:var(--surface);}
 
+.also-chip{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 13px;
+  border-radius:100px;
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--text-muted);
+  font-size:12px;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease;
+}
+
+.also-chip.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#18181b;
+  font-weight:700;
+}
+
+.also-row{display:flex;gap:8px;flex-wrap:wrap;}
+
 .manage-btn .count{
   font-family:'JetBrains Mono',monospace;
   font-size:11px;
@@ -476,7 +498,7 @@ function inCat(p,name){
     const names=categories.map(c=>c.name)
     return !p.category||!names.includes(p.category)
   }
-  return p.category===name
+  return p.category===name||(p.also||[]).includes(name)
 }
 
 function catIndices(){
@@ -597,6 +619,15 @@ function catOptions(selected){
   return out
 }
 
+function alsoChips(p,mi){
+  const others=categories.filter(c=>c.name!==(p.category||""))
+  if(others.length===0) return '<span style="font-size:12px;color:var(--text-muted)">no other categories yet</span>'
+  return others.map(c=>{
+    const active=(p.also||[]).includes(c.name)
+    return `<button type="button" class="also-chip${active?" active":""}" data-also="${esc(c.name)}" data-ai="${mi}">${esc(c.name)}</button>`
+  }).join("")
+}
+
 function renderPacks(){
   packList.innerHTML=""
   const idxs=catIndices()
@@ -621,6 +652,9 @@ function renderPacks(){
           </div>
         </div>
         <div class="field full"><label>Download link (MEGA)</label><input data-f="link" data-i="${mi}" value="${esc(p.link||"")}" placeholder="https://mega.nz/..."></div>
+        <div class="field full"><label>Also show in (optional)</label>
+          <div class="also-row">${alsoChips(p,mi)}</div>
+        </div>
         <div class="field"><label>Tags (comma separated)</label><input data-f="tags" data-i="${mi}" value="${esc((p.tags||[]).join(", "))}" placeholder="performance, 2026"></div>
         <div class="field" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div><label>Resolution</label><input data-f="res" data-i="${mi}" value="${esc(p.res||"")}" placeholder="4K"></div>
@@ -652,9 +686,21 @@ function renderPacks(){
         img.src=imgSrc(el.value)
       }
       if(f==="category"){
-        // pack moved to another category — it leaves this view
+        // pack moved to another category — keep 'also' consistent and refresh
+        packs[i].also=(packs[i].also||[]).filter(a=>a!==el.value)
         renderPacks()
       }
+    })
+  })
+
+  packList.querySelectorAll("[data-also]").forEach(chip=>{
+    chip.addEventListener("click",()=>{
+      const i=+chip.dataset.ai, name=chip.dataset.also
+      const p=packs[i]
+      p.also=p.also||[]
+      const at=p.also.indexOf(name)
+      if(at>=0){p.also.splice(at,1)}else{p.also.push(name)}
+      chip.classList.toggle("active",at<0)
     })
   })
 
@@ -804,7 +850,7 @@ document.getElementById("addPackBtn").addEventListener("click",()=>{
   packs.unshift({
     img:"",link:"",title:"",
     category:currentCat===UNCAT?"":currentCat,
-    tags:[],res:"",size:"",
+    tags:[],res:"",size:"",also:[],
     added:Date.now()
   })
   renderPacks()
@@ -888,7 +934,7 @@ async function init(){
   const normPack=p=>({
     img:p.img||"",link:p.link||"",title:p.title||"",
     category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||"",
-    added:p.added||0
+    also:p.also||[],added:p.added||0
   })
   const normCat=c=>typeof c==="string"?{name:c,img:"",added:0}:{name:c.name||"",img:c.img||"",added:c.added||0}
 
