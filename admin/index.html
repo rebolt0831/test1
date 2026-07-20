@@ -177,6 +177,75 @@ a{color:inherit;}
 
 .tabs{display:flex;gap:8px;margin-top:6px;}
 
+/* stats */
+.stats-panel{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px;
+  margin-top:22px;
+}
+
+.stats-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+
+.stats-title{
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+}
+
+.tf-btns{display:flex;gap:6px;}
+
+.tf-btn{
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--text-muted);
+  padding:7px 13px;
+  border-radius:100px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.tf-btn.active{background:var(--accent);border-color:var(--accent);color:#18181b;}
+
+.stat-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+
+.stat-card{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  text-align:center;
+}
+
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;}
+.stat-label{font-size:11px;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;margin-top:6px;}
+
+.board{width:100%;border-collapse:collapse;font-size:13px;}
+.board th{
+  text-align:left;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  padding:8px 10px;
+  border-bottom:1px solid var(--line);
+}
+.board td{padding:9px 10px;border-bottom:1px solid var(--line);}
+.board tr:last-child td{border-bottom:none;}
+.board .rank{color:var(--text-muted);font-family:'JetBrains Mono',monospace;width:34px;}
+.board .num{text-align:right;font-family:'JetBrains Mono',monospace;}
+
+.stats-note{font-size:11.5px;color:var(--text-muted);margin-top:12px;}
+
+@media (max-width:700px){
+  .stat-cards{grid-template-columns:1fr;}
+}
+
 .tab{
   border:1px solid var(--line);
   background:var(--surface);
@@ -396,6 +465,27 @@ input::placeholder{color:var(--text-muted);}
   <div class="tabs">
     <button class="tab active" id="tabMain">Main site</button>
     <button class="tab" id="tabExclusive">Exclusive</button>
+  </div>
+
+  <div class="stats-panel" id="statsPanel" style="display:none">
+    <div class="stats-head">
+      <span class="stats-title">Site stats</span>
+      <div class="tf-btns">
+        <button class="tf-btn active" data-days="7">Last week</button>
+        <button class="tf-btn" data-days="30">Last month</button>
+        <button class="tf-btn" data-days="90">Last 90 days</button>
+      </div>
+    </div>
+    <div class="stat-cards">
+      <div class="stat-card"><div class="stat-num" id="statVisits">–</div><div class="stat-label">Page visits</div></div>
+      <div class="stat-card"><div class="stat-num" id="statViews">–</div><div class="stat-label">Scenepack views</div></div>
+      <div class="stat-card"><div class="stat-num" id="statDownloads">–</div><div class="stat-label">Download clicks</div></div>
+    </div>
+    <table class="board" id="statsBoard" style="display:none">
+      <thead><tr><th></th><th>Scenepack</th><th style="text-align:right">Views</th><th style="text-align:right">Downloads</th></tr></thead>
+      <tbody id="statsBoardBody"></tbody>
+    </table>
+    <div class="stats-note" id="statsNote"></div>
   </div>
 
   <div id="catView">
@@ -957,7 +1047,58 @@ async function init(){
   panel.style.display="block"
   savebar.style.display="flex"
   showCatView()
+  loadStats(7)
 }
+
+async function loadStats(days){
+  const sp=document.getElementById("statsPanel")
+  sp.style.display="block"
+  document.querySelectorAll(".tf-btn").forEach(b=>b.classList.toggle("active",+b.dataset.days===days))
+  const note=document.getElementById("statsNote")
+  note.textContent="loading…"
+
+  let res,data
+  try{
+    res=await fetch("/api/admin/stats?days="+days)
+    data=await res.json()
+  }catch(e){
+    note.textContent="Couldn't load stats."
+    return
+  }
+
+  if(!data.ok){
+    document.getElementById("statVisits").textContent="–"
+    document.getElementById("statViews").textContent="–"
+    document.getElementById("statDownloads").textContent="–"
+    note.textContent=data.error||"Stats not available."
+    return
+  }
+
+  const fmt=n=>n>=1000?(n/1000).toFixed(1).replace(/\.0$/,"")+"k":String(Math.round(n))
+  document.getElementById("statVisits").textContent=fmt(data.visits)
+  document.getElementById("statViews").textContent=fmt(data.viewsTotal)
+  document.getElementById("statDownloads").textContent=fmt(data.downloadsTotal)
+
+  const boardEl=document.getElementById("statsBoard")
+  const body=document.getElementById("statsBoardBody")
+  body.innerHTML=""
+  if(data.board&&data.board.length){
+    boardEl.style.display="table"
+    data.board.forEach((row,i)=>{
+      const tr=document.createElement("tr")
+      tr.innerHTML=`<td class="rank">#${i+1}</td><td>${esc(row.pack)}</td><td class="num">${fmt(row.views)}</td><td class="num">${fmt(row.downloads)}</td>`
+      body.appendChild(tr)
+    })
+    note.textContent="Counts are page loads / clicks, not unique people. History is kept for 90 days."
+  }else{
+    boardEl.style.display="none"
+    note.textContent="No scenepack activity in this window yet. History is kept for 90 days."
+  }
+}
+
+document.querySelectorAll(".tf-btn").forEach(b=>{
+  b.addEventListener("click",()=>loadStats(+b.dataset.days))
+})
 
 init()
 
