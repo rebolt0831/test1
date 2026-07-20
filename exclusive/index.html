@@ -1467,6 +1467,14 @@ function renderDetail(id){
     ${tags.map(t=>`<span class="tag-pill">${t}</span>`).join("")}
   `
   document.getElementById("detailDownload").href=pack.link
+  if(window.sceneagbTrack) sceneagbTrack("view",title)
+  const dlBtn=document.getElementById("detailDownload")
+  if(!dlBtn.dataset.tracked){
+    dlBtn.dataset.tracked="1"
+    dlBtn.addEventListener("click",()=>{
+      if(window.sceneagbTrack) sceneagbTrack("download",document.getElementById("detailTitle").textContent)
+    })
+  }
 
   const moreGrid=document.getElementById("moreGrid")
   moreGrid.innerHTML=""
@@ -1777,6 +1785,17 @@ loadData()
   overlay.addEventListener("click",closeDrawer)
   closeBtn.addEventListener("click",closeDrawer)
   drawer.addEventListener("click",e=>{ if(e.target.closest("a")) closeDrawer() })
+})()
+</script>
+
+<script>
+(function(){
+  window.sceneagbTrack=function(type,pack){
+    try{
+      fetch("/api/track",{method:"POST",body:JSON.stringify({type:type,pack:pack||""}),keepalive:true}).catch(()=>{})
+    }catch(e){}
+  }
+  sceneagbTrack("visit")
 })()
 </script>
 </body>
