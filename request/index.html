@@ -1027,5 +1027,16 @@ init()
   drawer.addEventListener("click",e=>{ if(e.target.closest("a")) closeDrawer() })
 })()
 </script>
+
+<script>
+(function(){
+  window.sceneagbTrack=function(type,pack){
+    try{
+      fetch("/api/track",{method:"POST",body:JSON.stringify({type:type,pack:pack||""}),keepalive:true}).catch(()=>{})
+    }catch(e){}
+  }
+  sceneagbTrack("visit")
+})()
+</script>
 </body>
 </html>
