@@ -465,6 +465,7 @@ input::placeholder{color:var(--text-muted);}
   <div class="tabs">
     <button class="tab active" id="tabMain">Main site</button>
     <button class="tab" id="tabExclusive">Exclusive</button>
+    <button class="tab" id="tabStats">Stats</button>
   </div>
 
   <div class="stats-panel" id="statsPanel" style="display:none">
@@ -559,6 +560,8 @@ function imgSrc(path){
 }
 
 function switchTab(tab){
+  document.getElementById("statsPanel").style.display="none"
+  document.getElementById("tabStats").classList.remove("active")
   activeTab=tab
   packs=data[tab].packs
   categories=data[tab].categories
@@ -566,6 +569,15 @@ function switchTab(tab){
   document.getElementById("tabMain").classList.toggle("active",tab==="main")
   document.getElementById("tabExclusive").classList.toggle("active",tab==="exclusive")
   showCatView()
+}
+
+function showStatsTab(){
+  catView.style.display="none"
+  packView.style.display="none"
+  document.getElementById("tabMain").classList.remove("active")
+  document.getElementById("tabExclusive").classList.remove("active")
+  document.getElementById("tabStats").classList.add("active")
+  loadStats(currentStatsDays)
 }
 
 function showCatView(){
@@ -869,6 +881,9 @@ function uploadImage(onDone,btn){
 
 document.getElementById("tabMain").addEventListener("click",()=>switchTab("main"))
 document.getElementById("tabExclusive").addEventListener("click",()=>switchTab("exclusive"))
+document.getElementById("tabStats").addEventListener("click",showStatsTab)
+
+let currentStatsDays=7
 document.getElementById("backToCats").addEventListener("click",showCatView)
 
 let delAllTimer=null
@@ -1047,10 +1062,10 @@ async function init(){
   panel.style.display="block"
   savebar.style.display="flex"
   showCatView()
-  loadStats(7)
 }
 
 async function loadStats(days){
+  currentStatsDays=days
   const sp=document.getElementById("statsPanel")
   sp.style.display="block"
   document.querySelectorAll(".tf-btn").forEach(b=>b.classList.toggle("active",+b.dataset.days===days))
