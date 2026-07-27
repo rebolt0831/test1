@@ -6,11 +6,13 @@
 export async function onRequestGet({ request, env }) {
   let packs = null;
   let categories = [];
+  let version = 0;
 
   try {
     if (env.SCENEAGB_KV) {
       packs = await env.SCENEAGB_KV.get("packs", "json");
       categories = (await env.SCENEAGB_KV.get("categories", "json")) || [];
+      version = parseInt((await env.SCENEAGB_KV.get("site-version")) || "0", 10);
     }
   } catch (e) {
     // KV not bound — fall through to static file
@@ -25,7 +27,7 @@ export async function onRequestGet({ request, env }) {
     }
   }
 
-  return new Response(JSON.stringify({ packs, categories }), {
+  return new Response(JSON.stringify({ packs, categories, version }), {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",

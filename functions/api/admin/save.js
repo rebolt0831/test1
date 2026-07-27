@@ -36,6 +36,22 @@ export async function onRequestPost({ request, env }) {
   const categories = Array.isArray(body.categories) ? body.categories : null;
   const exclusivePacks = Array.isArray(body.exclusivePacks) ? body.exclusivePacks : [];
   const exclusiveCategories = Array.isArray(body.exclusiveCategories) ? body.exclusiveCategories : [];
+  const baseVersion = Number.isFinite(+body.baseVersion) ? +body.baseVersion : -1;
+
+  // ---- concurrent-edit guard: if someone saved since this admin loaded,
+  //      refuse and hand back the current data so the client can merge ----
+  const currentVersion = parseInt((await env.SCENEAGB_KV.get("site-version")) || "0", 10);
+  if (baseVersion !== currentVersion) {
+    const cur = async (k) => (await env.SCENEAGB_KV.get(k, "json")) || [];
+    return new Response(JSON.stringify({
+      conflict: true,
+      version: currentVersion,
+      packs: await cur("packs"),
+      categories: await cur("categories"),
+      exclusivePacks: await cur("exclusive-packs"),
+      exclusiveCategories: await cur("exclusive-categories"),
+    }), { status: 409, headers: { "Content-Type": "application/json" } });
+  }
 
   if (!packs || !categories) {
     return new Response(JSON.stringify({ error: "packs and categories must be arrays" }), {
@@ -45,7 +61,13 @@ export async function onRequestPost({ request, env }) {
   }
 
   // sanitise: keep only known fields, cap sizes
+  const hashId = (s) => {
+    let x = 5381;
+    for (let i = 0; i < s.length; i++) x = ((x << 5) + x + s.charCodeAt(i)) >>> 0;
+    return "h" + x.toString(36);
+  };
   const cleanPack = (p) => ({
+    id: String(p.id || hashId((p.img || "") + "|" + (p.link || ""))).slice(0, 40),
     img: String(p.img || "").slice(0, 300),
     link: String(p.link || "").slice(0, 500),
     title: String(p.title || "").slice(0, 120),
@@ -60,8 +82,9 @@ export async function onRequestPost({ request, env }) {
   const cleanExclusivePacks = exclusivePacks.slice(0, 500).map(cleanPack).filter((p) => p.img && p.link);
 
   const cleanCats = (arr) => arr.slice(0, 50).map((c) => {
-    if (typeof c === "string") return { name: c.slice(0, 60), img: "" };
+    if (typeof c === "string") return { id: "h" + c.slice(0, 30), name: c.slice(0, 60), img: "" };
     return {
+      id: String(c.id || ("c-" + (c.name || ""))).slice(0, 70),
       name: String(c.name || "").slice(0, 60),
       img: String(c.img || "").slice(0, 300),
       added: Number(c.added) || 0,
@@ -74,8 +97,10 @@ export async function onRequestPost({ request, env }) {
   await env.SCENEAGB_KV.put("categories", JSON.stringify(cleanCategories));
   await env.SCENEAGB_KV.put("exclusive-packs", JSON.stringify(cleanExclusivePacks));
   await env.SCENEAGB_KV.put("exclusive-categories", JSON.stringify(cleanExclusiveCategories));
+  const newVersion = currentVersion + 1;
+  await env.SCENEAGB_KV.put("site-version", String(newVersion));
 
-  return new Response(JSON.stringify({ ok: true, saved: cleanPacks.length }), {
+  return new Response(JSON.stringify({ ok: true, saved: cleanPacks.length, version: newVersion }), {
     headers: { "Content-Type": "application/json" },
   });
 }
