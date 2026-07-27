@@ -541,9 +541,24 @@ const packViewTitle=document.getElementById("packViewTitle")
 
 const UNCAT="__uncat__"
 
+function genId(){
+  return "i"+Date.now().toString(36)+Math.random().toString(36).slice(2,8)
+}
+
 let data={
   main:{packs:[],categories:[]},
   exclusive:{packs:[],categories:[]}
+}
+let loadedVersion=0
+// snapshot of what we loaded, keyed by id — lets a merge tell
+// "I edited this" apart from "someone else changed/deleted it"
+let orig={main:{packs:new Map(),categories:new Map()},exclusive:{packs:new Map(),categories:new Map()}}
+
+function takeSnapshot(){
+  for(const tab of ["main","exclusive"]){
+    orig[tab].packs=new Map(data[tab].packs.filter(p=>p.id).map(p=>[p.id,JSON.stringify(p)]))
+    orig[tab].categories=new Map(data[tab].categories.filter(c=>c.id).map(c=>[c.id,JSON.stringify(c)]))
+  }
 }
 let activeTab="main"
 let currentCat=null   // null = categories view; name or UNCAT = pack view
@@ -916,7 +931,7 @@ delAllBtn.addEventListener("click",()=>{
 document.getElementById("addCatBtn").addEventListener("click",()=>{
   const v=document.getElementById("newCat").value.trim()
   if(!v)return
-  if(!categories.some(c=>c.name===v))categories.unshift({name:v,img:"",added:Date.now()})
+  if(!categories.some(c=>c.name===v))categories.unshift({id:genId(),name:v,img:"",added:Date.now()})
   document.getElementById("newCat").value=""
   renderCats()
 })
@@ -953,6 +968,7 @@ delAllPacksBtn.addEventListener("click",()=>{
 
 document.getElementById("addPackBtn").addEventListener("click",()=>{
   packs.unshift({
+    id:genId(),
     img:"",link:"",title:"",
     category:currentCat===UNCAT?"":currentCat,
     tags:[],res:"",size:"",also:[],
@@ -961,6 +977,47 @@ document.getElementById("addPackBtn").addEventListener("click",()=>{
   renderPacks()
   window.scrollTo({top:packList.offsetTop-120,behavior:"smooth"})
 })
+
+// Merge our local state with data someone else saved meanwhile.
+// Their data is the base (their edits, deletions and ordering hold);
+// items WE added are inserted; items WE edited take our version.
+function mergeDatasets(theirs){
+  const mergeList=(mine,theirList,snapshot,addToFront)=>{
+    const theirIds=new Set(theirList.map(x=>x.id))
+    const result=theirList.map(t=>{
+      const mineItem=mine.find(m=>m.id===t.id)
+      if(mineItem&&snapshot.has(t.id)&&JSON.stringify(mineItem)!==snapshot.get(t.id)){
+        return mineItem // we edited this item — our edit wins
+      }
+      return t
+    })
+    const additions=[]
+    for(const m of mine){
+      if(!m.id) continue
+      if(theirIds.has(m.id)) continue
+      if(snapshot.has(m.id)) continue // existed when we loaded but gone now = they deleted it
+      additions.push(m) // brand-new item of ours
+    }
+    return addToFront?[...additions,...result]:[...result,...additions]
+  }
+
+  const normP=p=>({id:p.id||genId(),img:p.img||"",link:p.link||"",title:p.title||"",category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||"",also:p.also||[],added:p.added||0})
+  const normC=c=>({id:c.id||genId(),name:c.name||"",img:c.img||"",added:c.added||0})
+
+  const theirData={
+    main:{packs:(theirs.packs||[]).map(normP),categories:(theirs.categories||[]).map(normC)},
+    exclusive:{packs:(theirs.exclusivePacks||[]).map(normP),categories:(theirs.exclusiveCategories||[]).map(normC)}
+  }
+
+  for(const tab of ["main","exclusive"]){
+    data[tab].packs.splice(0,data[tab].packs.length,
+      ...mergeList(data[tab].packs,theirData[tab].packs,orig[tab].packs,true))
+    data[tab].categories.splice(0,data[tab].categories.length,
+      ...mergeList(data[tab].categories,theirData[tab].categories,orig[tab].categories,true))
+  }
+  packs=data[activeTab].packs
+  categories=data[activeTab].categories
+}
 
 document.getElementById("saveBtn").addEventListener("click",async()=>{
   const btn=document.getElementById("saveBtn")
@@ -976,27 +1033,51 @@ document.getElementById("saveBtn").addEventListener("click",async()=>{
 
   btn.disabled=true
   btn.textContent="Saving..."
+
+  let merged=false
   try{
-    const res=await fetch("/api/admin/save",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        packs:data.main.packs,
-        categories:data.main.categories,
-        exclusivePacks:data.exclusive.packs,
-        exclusiveCategories:data.exclusive.categories
+    for(let attempt=0;attempt<3;attempt++){
+      const res=await fetch("/api/admin/save",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          baseVersion:loadedVersion,
+          packs:data.main.packs,
+          categories:data.main.categories,
+          exclusivePacks:data.exclusive.packs,
+          exclusiveCategories:data.exclusive.categories
+        })
       })
-    })
-    const result=await res.json()
-    if(res.ok&&result.ok){
-      saveStatus.classList.add("ok")
-      saveStatus.textContent=`Saved ${result.saved} packs — live now.`
-    }else if(res.status===403){
+      const result=await res.json()
+
+      if(res.status===409&&result.conflict){
+        // someone saved while we were editing — fold their changes in and retry
+        mergeDatasets(result)
+        loadedVersion=result.version
+        merged=true
+        if(currentCat!==null){renderPacks()}else{renderCats()}
+        continue
+      }
+
+      if(res.ok&&result.ok){
+        loadedVersion=result.version||loadedVersion+1
+        takeSnapshot()
+        saveStatus.classList.add("ok")
+        saveStatus.textContent=merged
+          ?`Saved ${result.saved} packs — merged with a teammate's changes, everything kept.`
+          :`Saved ${result.saved} packs — live now.`
+      }else if(res.status===403){
+        saveStatus.classList.add("err")
+        saveStatus.textContent="Access denied — your team role may have been removed."
+      }else{
+        saveStatus.classList.add("err")
+        saveStatus.textContent=result.error||"Save failed."
+      }
+      break
+    }
+    if(!saveStatus.textContent){
       saveStatus.classList.add("err")
-      saveStatus.textContent="Access denied — your team role may have been removed."
-    }else{
-      saveStatus.classList.add("err")
-      saveStatus.textContent=result.error||"Save failed."
+      saveStatus.textContent="Couldn't save — the site is being edited very actively. Try again."
     }
   }catch(e){
     saveStatus.classList.add("err")
@@ -1037,14 +1118,16 @@ async function init(){
   topbarRight.style.display="flex"
 
   const normPack=p=>({
+    id:p.id||genId(),
     img:p.img||"",link:p.link||"",title:p.title||"",
     category:p.category||"",tags:p.tags||[],res:p.res||"",size:p.size||"",
     also:p.also||[],added:p.added||0
   })
-  const normCat=c=>typeof c==="string"?{name:c,img:"",added:0}:{name:c.name||"",img:c.img||"",added:c.added||0}
+  const normCat=c=>typeof c==="string"?{id:genId(),name:c,img:"",added:0}:{id:c.id||genId(),name:c.name||"",img:c.img||"",added:c.added||0}
 
   const res=await fetch("/api/packs")
   const mainData=await res.json()
+  loadedVersion=mainData.version||0
   data.main.packs.push(...(mainData.packs||[]).map(normPack))
   data.main.categories.push(...(mainData.categories||[]).map(normCat).filter(c=>c.name))
 
@@ -1059,6 +1142,7 @@ async function init(){
     }
   }catch(e){}
 
+  takeSnapshot()
   panel.style.display="block"
   savebar.style.display="flex"
   showCatView()
