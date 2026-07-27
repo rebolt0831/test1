@@ -1252,11 +1252,19 @@ function showSearchResults(q){
   browseBar.classList.add("visible")
   browseTitle.textContent='results for "'+q+'"'
   const ql=q.toLowerCase()
-  activeList=packs.map((p,i)=>({pack:p,idx:i}))
-    .filter(({pack})=>{
-      const hay=(packTitle(pack)+" "+(pack.tags||[]).join(" ")+" "+(pack.category||"")+" "+packAlso(pack).join(" ")).toLowerCase()
-      return hay.includes(ql)
-    })
+  // rank: title matches first, then tag matches, then category matches
+  activeList=packs.map((p,i)=>{
+    const title=packTitle(p).toLowerCase()
+    const tags=(p.tags||[]).join(" ").toLowerCase()
+    const cats=((p.category||"")+" "+packAlso(p).join(" ")).toLowerCase()
+    let score=0
+    if(title.startsWith(ql)) score=4
+    else if(title.includes(ql)) score=3
+    else if(tags.includes(ql)) score=2
+    else if(cats.includes(ql)) score=1
+    return {pack:p,idx:i,score}
+  }).filter(e=>e.score>0)
+    .sort((a,b)=>b.score-a.score||a.idx-b.idx)
   updateStats("search",activeList.length)
   grid.innerHTML=""
   renderedCount=0
