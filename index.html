@@ -1424,7 +1424,9 @@ function startSearchTypewriter(){
     searchInput.placeholder="search scenepacks..."
     return
   }
-  const words=packs.slice(0,20).map(p=>`search "${packTitle(p)}"...`)
+  // random selection each visit instead of newest-first
+  const shuffled=[...packs].sort(()=>Math.random()-0.5)
+  const words=shuffled.slice(0,20).map(p=>`search "${packTitle(p)}"...`)
   if(words.length===0) return
   let wordIndex=0, charIndex=0, deleting=false
 
