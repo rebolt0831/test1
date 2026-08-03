@@ -916,6 +916,20 @@ footer{
   pointer-events:none;
 }
 
+
+/* thumbnails: no text-selection highlight, no long-press callout, no drag ghost */
+.card,.card *,.more-card,.more-card *,.cat-card,.cat-card *{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+
+.card img,.more-card img,.cat-card img{
+  -webkit-user-drag:none;
+  user-drag:none;
+  pointer-events:auto;
+}
+
 /* ---------- LIGHT MODE ---------- */
 
 html.light{
