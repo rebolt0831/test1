@@ -1412,6 +1412,11 @@ function showCategoryPacks(cat){
   browseBar.classList.add("visible")
   browseTitle.textContent=cat
   activeList=packs.map((p,i)=>({pack:p,idx:i})).filter(({pack})=>packCategory(pack)===cat||packAlso(pack).includes(cat))
+  // new packs float to the top of their category for 7 days, newest first;
+  // everything else keeps the admin's manual order
+  const freshP=activeList.filter(e=>isNew(e.pack)).sort((a,b)=>(b.pack.added||0)-(a.pack.added||0))
+  const restP=activeList.filter(e=>!isNew(e.pack))
+  activeList=[...freshP,...restP]
   updateStats("category",activeList.length,cat)
   grid.innerHTML=""
   renderedCount=0
